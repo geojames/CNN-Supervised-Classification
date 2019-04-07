@@ -1,6 +1,13 @@
 # Self-Supervised-Classification
 Python code for self-supervised classification of remotely sensed imagery - part of the Deep Riverscapes project
 
+ ## Dependencies
+* Keras (we use TensorFlow as the backend)
+* Scikit-Learn
+* Imbalanced-Learn toolbox 
+* Scikit-Image
+* Pandas
+
 #### Authors:
  - Patrice E. Carbonneau, University of Durham, [e-mail](mailto:patrice.carbonneau@durham.ac.uk)
  - Toby P. Breckon, University of Durham
@@ -10,9 +17,4 @@ Python code for self-supervised classification of remotely sensed imagery - part
  - Hitoshi Miyamoto, Shibaura Institute of Technology
  - Amy S. Woodget, Loughborough University
  
- ## Dependencies
-* Keras (we use TensorFlow as the backend)
-* Scikit-Learn
-* Imbalanced-Learn toolbox 
-* Scikit-Image
-* Pandas
+

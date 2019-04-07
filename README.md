@@ -9,3 +9,10 @@ Python code for self-supervised classification of remotely sensed imagery - part
  - Mark A. Fonstad, University of Oregon
  - Hitoshi Miyamoto, Shibaura Institute of Technology
  - Amy S. Woodget, Loughborough University
+ 
+ ## Dependencies
+* Keras (we use TensorFlow as the backend)
+* Scikit-Learn
+* Imbalanced-Learn toolbox 
+* Scikit-Image
+* Pandas

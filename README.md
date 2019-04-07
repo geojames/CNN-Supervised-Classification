@@ -1,4 +1,4 @@
-# Self-Supervised-Classification
+# Self-Supervised Classification
 Python code for self-supervised classification of remotely sensed imagery - part of the Deep Riverscapes project
 
  ## Dependencies

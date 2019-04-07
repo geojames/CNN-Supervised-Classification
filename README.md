@@ -7,4 +7,5 @@ Python code for self-supervised classification of remotely sensed imagery - part
  - James T. Dietrich, University of Northern Iowa
  - Steven J. Dugdale, University of Nottingham
  - Mark A. Fonstad, University of Oregon
+ - Hitoshi Miyamoto, Shibaura Institute of Technology
  - Amy S. Woodget, Loughborough University

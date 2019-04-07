@@ -12,7 +12,7 @@ Supervised classification is a workflow in Remote Sensing (RS) whereby a human u
 ## Getting Started
 
 ### Disclaimer
-This code is currently in the development stage and inteneded for research purposes.  The coding structure is naive and not optimised for production.  The process is not yet designed to output class rasters for new unclassified images and expects every image to have an accompanying class raster for either training or for validation. 
+This code is currently in the development stage and intended for research purposes.  The coding structure is naive and not optimised for production.  The process is not yet designed to output class rasters for new unclassified images and expects every image to have an accompanying class raster for either training or for validation. 
 
 ### Data preparation
 It is assumed that the data comes in the format that typically results from an airborne survey such as: root_number.  We recommend that the data be structured as: RiverName_Number.jpg.  The number must be in 5 digit format.  The associated classification is expected to have the same filename but with a prefix of 'SCLS' and a tif format.  

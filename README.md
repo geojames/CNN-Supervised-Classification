@@ -40,7 +40,7 @@ Once a trained CNN model is in place, SSC performance can be evaluated with Self
  
 Carbonneau et al, 2019, Generalised classification of hyperspatial resolution airborne imagery of fluvial scenes with deep convolutional neural networks. Geophysical Research Abstracts, EGU2019-1865, EGU General Assembly 2019.
 
-The poster is available [here](https://drive.google.com/drive/folders/14nc600DprwxXdzHvIMdLBLH_xVX8pe30?usp=sharing)
+This poster is available [here](https://drive.google.com/drive/folders/14nc600DprwxXdzHvIMdLBLH_xVX8pe30?usp=sharing)
  
  
  

@@ -15,10 +15,18 @@ Supervised classification is a workflow in Remote Sensing (RS) whereby a human u
 This code is currently in the development stage and intended for research purposes.  The coding structure is naive and not optimised for production.  The process is not yet designed to output class rasters for new unclassified images and expects every image to have an accompanying class raster for either training or for validation. 
 
 ### Data preparation
-It is assumed that the data comes in the format that typically results from an airborne survey such as: root_number.  We recommend that the data be structured as: RiverName_Number.jpg.  The number must be in 5 digit format.  The associated classification is expected to have the same filename but with a prefix of 'SCLS_' and a tif format.  
+It is assumed that the data comes in the format that typically results from an airborne survey such as: root_number.jpg.   We recommend that the data be structured as: RiverName_Number.jpg.  The number must be in 5 digit format.  The associated classification is expected to have the same filename but with a prefix of 'SCLS_' and a tif format. Test data is available on HydroShare, link is below.  
 
 ### CNN Training
-Once image data is organised, the script TrainCNN_NASNetLarge.py can be used to train the NASNet Large architecture.  User options are at the start.  It is recommended to set the ModelTuning variable to True in the first instance and run the tuning procedure for the CNN.  This will output a figure and the correct number of tuning epochs can be set as the point where the loss and accuracy of the validation data begin to diverge from the loss and accuracy of the training data.  Once this is established, the script must be run again with ModelTuning set to False and the correct value for Tuning. This will save the model with a .h5 extension and it will also save a class key as a small csv file.
+Once image data is organised, the script TrainCNN_NASNetLarge.py can be used to train the NASNet Large architecture.  An equivalent script for NASNet_Mobile is also available.  User options are at the start.  Elements marked Empty need to be edited.  At least 1 of 12  RiverName variables must be specified.  This must correspond to the root of an image as sepcified above in data preparation.  On first running, it is recommended to set the ModelTuning variable to True and run the tuning procedure for the CNN.  This will output a figure and the correct number of tuning epochs can be set as the point where the loss and accuracy of the validation data begin to diverge from the loss and accuracy of the training data.  Once this is established, the script must be run again with ModelTuning set to False and the correct value for Tuning. This will save the model with a .h5 extension and it will also save a class key as a small csv file. Once these options are edited in the code no switches are required. e.g. :
+```
+TrainCNN_NASNetLarge
+```
+will work from an Ipython console and:
+```
+python C:\MyCode\TrainCNN_NASNetLarge.py
+```
+will execute the script from a prompt provided the code path is correct
 
 ### SSC execution
 Once a trained CNN model is in place, SSC performance can be evaluated with SelfSupervisedClassification.py.  The images to test must follow the same naming convention and all have an existing set of manual labels used to calculate validation statistics.  These should not be the same images as used to train the CNN.  Once the numerous parameters have been adjusted (seee citation), the script will execute and output performance metrics for each image.  csv files with a CNN_ prefix give performance metrics for the CNN model with F1 scores and support (# of pixels) for each class.  SSC_ files give the same metrics for the final SSC result after the application of the MLP or the Random Forest selected in the options. A 4-part figure will also be output showing the original image, the existing class labels, the CNN classification and the final SSC classification labelled either MLP or RF.

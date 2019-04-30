@@ -39,7 +39,7 @@ python C:\MyCode\SelfSupervisedClassification.py
 ```
 will execute the script from a prompt provided the code path is correct.  The easiest option remains the use Spyder to edit, save and execute the directly from the editor (Hotkey: F5). 
 
-
+![GitHub_StMarg27170](https://user-images.githubusercontent.com/47110600/56954226-31d59e00-6b36-11e9-92ff-6ab1e5489597.png)
 
 *Figure 1. Sample 4-part output*
 

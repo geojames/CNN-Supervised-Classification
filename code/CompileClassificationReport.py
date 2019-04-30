@@ -28,6 +28,7 @@ ScorePath = "Empty"
 Experiment = 'Empty'
 model = 'Empty'
 Phase2Type = 'Empty' #indicate wether the phase 2 ML algorithm was RF or MLP
+
 TestRiverName1 = "Empty"  #
 TestRiverName2 = "Empty"  # 
 TestRiverName3 = "Empty"  # 

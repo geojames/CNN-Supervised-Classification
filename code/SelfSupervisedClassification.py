@@ -71,12 +71,12 @@ BiggestImage = 9999 #Enter the number, can be approximate but bigger, of the las
 Ndims = 4 # Feature Dimensions. 4 if using entropy in the self-supervised classification, 3 if just RGB
 DropRate = 0.5
 
-#Set DNN below to True to use the output of the CNN as training data in an MLP, defined below. False will use a random forest.
-DNN = True 
-#Choose DNN model
+#Set MLP below to True to use the output of the CNN as training data in an MLP, defined below. False will use a random forest.
+MLP = True 
+#Choose MLP model
 ModelChoice = 2 # 2 for deep model and 3 for very deep model 
 LearningRate = 0.001
-#If DNN is True, enter the right number of epochs. 
+#If MLP is True, enter the right number of epochs. 
 TrainingEpochs = 70
 
 
@@ -292,7 +292,7 @@ def very_deep_model_L2D():
 
 
 
-# Instantiate and fit a DNN model estimator from choices above
+# Instantiate and fit a MLP model estimator from choices above
 if ModelChoice == 1:
     print("Don't waste your time in shallow learning...")
     
@@ -357,7 +357,7 @@ for f in range(0,len(TestRiverTuple)):
             PredictedTiles[PredictedTiles < RecogThresh] = 0
             PredictedClass = class_prediction_to_image(Class, PredictedTiles, size)
             PredictedClass = SimplifyClass(PredictedClass, ClassKey)
-            #Set classes to 0 if they do not have MinTiles detected by the AI
+            #Set classes to 0 if they do not have MinTiles detected by the CNN
             
             #for c in range(0,NClasses+1):
             #    count = np.sum(PredictedClass.reshape(-1,1) == c)
@@ -374,7 +374,7 @@ for f in range(0,len(TestRiverTuple)):
             rv = MedImage[:,:,0].reshape(-1,1)#Split and vectorise the bands
             gv = MedImage[:,:,1].reshape(-1,1)
             bv = MedImage[:,:,2].reshape(-1,1)
-            #Vectorise the bands, use the classification prdicted by the AI
+            #Vectorise the bands, use the classification prdicted by the CNN
             #m = np.ndarray.flatten(PredictedClass).reshape(-1,1) 
             #rv = np.ndarray.flatten(r).reshape(-1,1)
             #gv = np.ndarray.flatten(g).reshape(-1,1)
@@ -393,7 +393,7 @@ for f in range(0,len(TestRiverTuple)):
             ColumnDat = ColumnDat[ColumnDat[:,4]!=0]
             
             m=ColumnDat[:,-1]
-            #Build the predictor from the AI classified mask
+            #Build the predictor from the CNN classified mask
             #Subsample the pixels
             sample_size = np.int64(SubSample * ColumnDat.shape[0])
             if (sample_size < MinSample) and (ColumnDat.shape[0] > MinSample):
@@ -418,8 +418,8 @@ for f in range(0,len(TestRiverTuple)):
              
 
             
-            if DNN:
-                print('Fitting Neural Network Classifier on ' + str(len(X)) + ' pixels')
+            if MLP:
+                print('Fitting MLP Classifier on ' + str(len(X)) + ' pixels')
                 EstimatorNN.fit(X, Y)
             else:
              
@@ -431,7 +431,7 @@ for f in range(0,len(TestRiverTuple)):
             del(rv,gv,bv,Entropyv, MedImage)
             SCAL = StandardScaler()
             ScaledValues = SCAL.fit_transform(FullDat)
-            if DNN:
+            if MLP:
                 PredictedPixels = EstimatorNN.predict(ScaledValues)
             else:
                 PredictedPixels = EstimatorRF.predict(ScaledValues)
@@ -445,30 +445,30 @@ for f in range(0,len(TestRiverTuple)):
             #Produce classification reports 
             Class = Class.reshape(-1,1)
             PredictedImageVECT = PredictedImage.reshape(-1,1) #This is the pixel-based prediction
-            PredictedClassVECT = PredictedClass.reshape(-1,1) # This is the AI tiles prediction
+            PredictedClassVECT = PredictedClass.reshape(-1,1) # This is the CNN tiles prediction
             PredictedImageVECT = PredictedImageVECT[Class != 0]
             PredictedClassVECT = PredictedClassVECT[Class != 0]
             Class = Class[Class != 0]
             Class = np.int32(Class)
             PredictedImageVECT = np.int32(PredictedImageVECT)
             reportSSC = metrics.classification_report(Class, PredictedImageVECT, digits = 3)
-            reportAI = metrics.classification_report(Class, PredictedClassVECT, digits = 3)
-            print('AI tiled classification results for ' + ImagePath)
-            print(reportAI)
+            reportCNN = metrics.classification_report(Class, PredictedClassVECT, digits = 3)
+            print('CNN tiled classification results for ' + ImagePath)
+            print(reportCNN)
             print('\n')
             print('Self-Supervised classification results for ' + ImagePath)
             print(reportSSC)
             #print('Confusion Matrix:')
             #print(metrics.confusion_matrix(Class, PredictedImageVECT))
             print('\n')
-            if DNN:
-                SSCname = ScorePath + 'SSC_DNN_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
+            if MLP:
+                SSCname = ScorePath + 'SSC_MLP_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
                 classification_report_csv(reportSSC, SSCname)
             else:
                 SSCname = ScorePath + 'SSC_RF_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
                 classification_report_csv(reportSSC, SSCname)
-            AIname = ScorePath + 'AI_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
-            classification_report_csv(reportAI, AIname)            
+            CNNname = ScorePath + 'CNN_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
+            classification_report_csv(reportCNN, CNNname)            
             
             #Display results
             #PredictedImage = PredictedPixels.reshape(Entropy.shape[0], Entropy.shape[1])
@@ -496,12 +496,12 @@ for f in range(0,len(TestRiverTuple)):
             ax.legend(handles=[class0_box, class1_box,class2_box,class3_box,class4_box,class5_box])
             plt.subplot(2,2,3)
             plt.imshow(PredictedClass, cmap=cmapCHM)
-            plt.xlabel('AI tiles Classification. F1: ' + GetF1(reportAI), fontweight='bold')
+            plt.xlabel('CNN tiles Classification. F1: ' + GetF1(reportCNN), fontweight='bold')
             plt.subplot(2,2,4)
             cmapCHM = colors.ListedColormap(['black', 'lightblue','orange','green','yellow','red'])
             plt.imshow(PredictedImage, cmap=cmapCHM)
-            if DNN:
-                plt.xlabel('Self-Supervised Classification (DNN). F1: ' + GetF1(reportSSC), fontweight='bold' )
+            if MLP:
+                plt.xlabel('Self-Supervised Classification (MLP). F1: ' + GetF1(reportSSC), fontweight='bold' )
             else:
                 plt.xlabel('Self-Supervised Classification (RF). F1: ' + GetF1(reportSSC), fontweight='bold' )
             FigName = ScorePath + 'SSC_' + 'OutFig_' + TestRiverTuple[f] + format(i,'05d') +'.png'

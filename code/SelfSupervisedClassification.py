@@ -43,9 +43,9 @@ from IPython import get_ipython #this can be removed if not using Spyder
 #############################################################
 
 ModelPath = "Empty"  #should be the training path from previous run of TrainCNN_
-PredictPath = "Empty"
-ModelName = 'Empty'   #The retrained convnet to use, do not specify extension
-ScorePath = "Empty"
+PredictPath = "Empty" #Location of the images
+ModelName = 'Empty'   #The retrained convnet to use, do not specify extension. Must be located in ModelPath
+ScorePath = "Empty" #location of the output files
 Experiment = 'Empty' #ID to append to output performance files
 
 

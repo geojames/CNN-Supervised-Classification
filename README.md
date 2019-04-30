@@ -39,8 +39,14 @@ python C:\MyCode\SelfSupervisedClassification.py
 ```
 will execute the script from a prompt provided the code path is correct.  The easiest option remains the use Spyder to edit, save and execute the directly from the editor (Hotkey: F5). 
 
+
+
+*Figure 1. Sample 4-part output*
+
 ### Report Compilation
 The SSC execution will result 3 files per classified image: separate classification score files for for the CNN and MLP (or RF) stages and an image file showing the input image, the validation data, the CNN classification (used sas training data for the next step) and the MLP (or RF) classification. CompileClassificationReports.py can be edited and executed in a similar way and will output a single csv file whose format is intended for use with Pandas and Seaborn for visualisation.  
+
+
 
 
 

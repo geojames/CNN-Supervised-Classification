@@ -47,9 +47,9 @@ will execute the script from a prompt provided the code path is correct.  The ea
 The SSC execution will result 3 files per classified image: separate classification score files for for the CNN and MLP (or RF) stages and an image file showing the input image, the validation data, the CNN classification (used sas training data for the next step) and the MLP (or RF) classification. CompileClassificationReports.py can be edited and executed in a similar way and will output a single csv file whose format is intended for use with Pandas and Seaborn for visualisation.  
 
 
+![GitHub_SSCample](https://user-images.githubusercontent.com/47110600/56954483-c809c400-6b36-11e9-8d1a-fa19647ba524.png)
 
-
-
+*Figure 2. Sample of results as violin plots.  Here we show the outputs for the Ouelle river in Canada
 
 
 ## Authors:

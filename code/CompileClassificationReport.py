@@ -5,6 +5,9 @@ Created on Sat Jul 21 09:33:42 2018
 @author: dgg0pc
 
 Compile classification reports
+this utility runs through the individual outputs of SelfSupervisedClassification and compiles
+the results into a single spreadsheet with a column structure that 
+works well with Seaborn switches for hues and other visualisation options
 """
 
 ###############################################################################
@@ -21,10 +24,10 @@ import os.path
 #############################################################
 
 ScorePath = "C:\\DATA\\DeepRiverscapes\\SingleRiver\\"
-ExperimentName = 'Kurobe'
+#ExperimentName = 'Kurobe'
 Experiment = '1river'
 model = 'NasNetLarge'
-SSCType = 'MLP' #indicate wether the phase 2 ML algorithm was RF or MLP
+Phase2Type = 'MLP' #indicate wether the phase 2 ML algorithm was RF or MLP
 TestRiverName1 = "Kurobe"  #
 TestRiverName2 = "Empty"  # 
 TestRiverName3 = "Empty"  # 
@@ -166,10 +169,10 @@ for f in range(0,len(TestRiverTuple)):
  
 
 
-TypeName = 'SSC_MLP_' 
+TypeName = Phase2Type + '_' 
 for f in range(0,len(TestRiverTuple)):
 
-    print('Compiling MLP reports for ' + TestRiverTuple[f])
+    print('Compiling phase 2 reports for ' + TestRiverTuple[f])
     for i in range(0,32000): #32000 will cover the large numbers in the StMarg set
         #if 'Kinogawa' in TestRiverTuple[f]:
             #ReportPath = ScorePath + TypeName + TestRiverTuple[f] + format(i,'05d') + '_' + ExperimentName + 'Kingogawa'+'_50pxExp'+'.csv'
@@ -187,55 +190,55 @@ for f in range(0,len(TestRiverTuple)):
                     F1values[c,0] = FileValues[0]
                     F1values[c,1] = FileValues[1]
                     if (c==1 and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'MLP', 'Sample':'InSample', 'Class':'Water', 'Experiment':Experiment, 'model':model}
+                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'InSample', 'Class':'Water', 'Experiment':Experiment, 'model':model}
                         FileDF = pd.DataFrame(FileDict)
                         MasterDF = pd.concat([MasterDF, FileDF])						
                     elif (c==2  and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'MLP', 'Sample':'InSample', 'Class':'Sediment', 'Experiment':Experiment, 'model':model}
+                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'InSample', 'Class':'Sediment', 'Experiment':Experiment, 'model':model}
                         FileDF = pd.DataFrame(FileDict)
                         MasterDF = pd.concat([MasterDF, FileDF])
                     elif (c==3 and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'MLP', 'Sample':'InSample', 'Class':'Green Veg.', 'Experiment':Experiment, 'model':model}
+                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'InSample', 'Class':'Green Veg.', 'Experiment':Experiment, 'model':model}
                         FileDF = pd.DataFrame(FileDict)
                         MasterDF = pd.concat([MasterDF, FileDF])
                     elif (c==4 and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'MLP', 'Sample':'InSample', 'Class':'Senesc. Veg.', 'Experiment':Experiment, 'model':model}
+                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'InSample', 'Class':'Senesc. Veg.', 'Experiment':Experiment, 'model':model}
                         FileDF = pd.DataFrame(FileDict)
                         MasterDF = pd.concat([MasterDF, FileDF])
                     elif (c==5 and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'MLP', 'Sample':'InSample', 'Class':'Paved Road', 'Experiment':Experiment, 'model':model}
+                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'InSample', 'Class':'Paved Road', 'Experiment':Experiment, 'model':model}
                         FileDF = pd.DataFrame(FileDict)
                         MasterDF = pd.concat([MasterDF, FileDF])
                     elif (c==1 and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'MLP', 'Sample':'OutOfSample', 'Class':'Water', 'Experiment':Experiment, 'model':model}
+                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'OutOfSample', 'Class':'Water', 'Experiment':Experiment, 'model':model}
                         FileDF = pd.DataFrame(FileDict)
                         MasterDF = pd.concat([MasterDF, FileDF])
                     elif (c==2  and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'MLP', 'Sample':'OutOfSample', 'Class':'Sediment', 'Experiment':Experiment, 'model':model}
+                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'OutOfSample', 'Class':'Sediment', 'Experiment':Experiment, 'model':model}
                         FileDF = pd.DataFrame(FileDict)
                         MasterDF = pd.concat([MasterDF, FileDF])
                     elif (c==3 and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'MLP', 'Sample':'OutOfSample', 'Class':'Green Veg.', 'Experiment':Experiment, 'model':model}
+                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'OutOfSample', 'Class':'Green Veg.', 'Experiment':Experiment, 'model':model}
                         FileDF = pd.DataFrame(FileDict)
                         MasterDF = pd.concat([MasterDF, FileDF])
                     elif (c==4 and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'MLP', 'Sample':'OutOfSample', 'Class':'Senesc. Veg.', 'Experiment':Experiment, 'model':model}
+                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'OutOfSample', 'Class':'Senesc. Veg.', 'Experiment':Experiment, 'model':model}
                         FileDF = pd.DataFrame(FileDict)
                         MasterDF = pd.concat([MasterDF, FileDF])
                     elif (c==5 and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'MLP', 'Sample':'OutOfSample', 'Class':'Paved Road', 'Experiment':Experiment, 'model':model}
+                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'OutOfSample', 'Class':'Paved Road', 'Experiment':Experiment, 'model':model}
                         FileDF = pd.DataFrame(FileDict)
                         MasterDF = pd.concat([MasterDF, FileDF])
             if f>5:
                 WF1 = np.sum((F1values[:,0]*F1values[:,1]))/np.sum(F1values[:,1])
-                FileDict = {'F1':[WF1], 'Support':[np.sum(F1values[:,1])], 'RiverName':TestRiverTuple[f], 'Type':'MLP', 'Sample':'OutOfSample', 'Class':'ALL', 'Experiment':Experiment, 'model':model}
+                FileDict = {'F1':[WF1], 'Support':[np.sum(F1values[:,1])], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'OutOfSample', 'Class':'ALL', 'Experiment':Experiment, 'model':model}
                 FileDF = pd.DataFrame(FileDict)
                 MasterDF = pd.concat([MasterDF, FileDF])
             else:
                 WF1 = np.sum((F1values[:,0]*F1values[:,1]))/np.sum(F1values[:,1])
-                FileDict = {'F1':[WF1], 'Support':[np.sum(F1values[:,1])], 'RiverName':TestRiverTuple[f], 'Type':'MLP', 'Sample':'InSample', 'Class':'ALL', 'Experiment':Experiment, 'model':model}
+                FileDict = {'F1':[WF1], 'Support':[np.sum(F1values[:,1])], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'InSample', 'Class':'ALL', 'Experiment':Experiment, 'model':model}
                 FileDF = pd.DataFrame(FileDict)
                 MasterDF = pd.concat([MasterDF, FileDF])
  
-SaveName = ScorePath + 'ALL_' + ExperimentName + '.csv'
+SaveName = ScorePath + 'Compiled_' + Experiment + '.csv'
 MasterDF.to_csv(SaveName)

@@ -174,9 +174,7 @@ for f in range(0,len(TestRiverTuple)):
 
     print('Compiling phase 2 reports for ' + TestRiverTuple[f])
     for i in range(0,32000): #32000 will cover the large numbers in the StMarg set
-        #if 'Kinogawa' in TestRiverTuple[f]:
-            #ReportPath = ScorePath + TypeName + TestRiverTuple[f] + format(i,'05d') + '_' + ExperimentName + 'Kingogawa'+'_50pxExp'+'.csv'
-        #else:
+
         ReportPath = ScorePath + TypeName + TestRiverTuple[f] + format(i,'05d') + '_'+ Experiment +'.csv'
         
         if os.path.exists(ReportPath):

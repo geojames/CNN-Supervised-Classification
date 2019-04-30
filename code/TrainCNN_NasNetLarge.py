@@ -249,12 +249,8 @@ for f in range(0,len(RiverTuple)):
             Class = io.imread(ClassPath, as_grey=True)
             if Im3D.shape[0] != Class.shape[0]:
                 sys.exit("Error, Image and class mask do not have the same dimensions")
-
-##############################################################################
-'''Transform macro-class from the classification 1 to N where N is the number of classes to 
- micro-classes 1 to micro-class 1 to fN where f is the number of rivers'''
                 
-            NewClass = Class + f*NClasses
+            NewClass = Class + f*NClasses #Transform macro-class from the classification 1 to N where N is the number of classes to micro-classes.
             NewClass[Class == 0] = 0 #this step avoids the unclassified areas becoming class f*(NClasses)
             Class = copy.deepcopy(NewClass)
             ImCrop = CropToTile (Im3D, size)
@@ -267,6 +263,11 @@ for f in range(0,len(RiverTuple)):
             ImageTensor = np.concatenate((ImageTensor,ClassifiedTiles), axis = 0)
             LabelTensor = np.concatenate((LabelTensor, Label1hot), axis = 0)
             del(ImCrop,ClsCrop,I_tiles, C_tiles, Label1hot, Class, NewClass, Im3D, CLabelVector, ClassifiedTiles)
+            
+
+#
+                
+
 
 #Delete the first blank tile from initialisation
 ImageTensor = ImageTensor[1:,:,:,:]

@@ -42,8 +42,13 @@ from IPython import get_ipython #this can be removed if not using Spyder
 """User data input. Fill in the info below before running"""
 #############################################################
 
-ModelPath = ""  #should be the training path from previous run of TrainCNN_
-PredictPath = ""
+ModelPath = "Empty"  #should be the training path from previous run of TrainCNN_
+PredictPath = "Empty"
+ModelName = 'Empty'   #The retrained convnet to use, do not specify extension
+ScorePath = "Empty"
+Experiment = 'Empty' #ID to append to output performance files
+
+
 TestRiverName1 = "Empty"  #
 TestRiverName2 = "Empty"  # 
 TestRiverName3 = "Empty"  # 
@@ -56,9 +61,7 @@ TestRiverName9 = "Empty"
 TestRiverName10 = "Empty"
 TestRiverName11 = "Empty"
 TestRiverName12 = "Empty"
-ModelName = ''   #The retrained convnet to use, do not specify extension
-ScorePath = ""
-Experiment = '' #ID to append to output performance files
+
 
 
 UseSmote = False#Turn SMOTE-ENN resampling on and off

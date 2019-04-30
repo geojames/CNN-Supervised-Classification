@@ -58,7 +58,7 @@ TestRiverName11 = "Empty"
 TestRiverName12 = "Empty"
 ModelName = ''   #The retrained convnet to use, do not specify extension
 ScorePath = ""
-ExperimentName = '' #ID to append to output performance files
+Experiment = '' #ID to append to output performance files
 
 
 UseSmote = False#Turn SMOTE-ENN resampling on and off
@@ -462,12 +462,12 @@ for f in range(0,len(TestRiverTuple)):
             #print(metrics.confusion_matrix(Class, PredictedImageVECT))
             print('\n')
             if MLP:
-                SSCname = ScorePath + 'MLP_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
+                SSCname = ScorePath + 'MLP_' + TestRiverTuple[f] + format(i,'05d') +  '_' + Experiment + '.csv'    
                 classification_report_csv(reportSSC, SSCname)
             else:
-                SSCname = ScorePath + 'RF_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
+                SSCname = ScorePath + 'RF_' + TestRiverTuple[f] + format(i,'05d') +  '_' + Experiment + '.csv'    
                 classification_report_csv(reportSSC, SSCname)
-            CNNname = ScorePath + 'CNN_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
+            CNNname = ScorePath + 'CNN_' + TestRiverTuple[f] + format(i,'05d') +  '_' + Experiment + '.csv'    
             classification_report_csv(reportCNN, CNNname)            
             
             #Display and/or oputput figure results
@@ -504,7 +504,7 @@ for f in range(0,len(TestRiverTuple)):
                 plt.xlabel('Self-Supervised Classification (MLP). F1: ' + GetF1(reportSSC), fontweight='bold' )
             else:
                 plt.xlabel('Self-Supervised Classification (RF). F1: ' + GetF1(reportSSC), fontweight='bold' )
-            FigName = ScorePath + 'SSC_'+  ExperimentName + '_'+ TestRiverTuple[f] + format(i,'05d') +'.png'
+            FigName = ScorePath + 'SSC_'+  Experiment + '_'+ TestRiverTuple[f] + format(i,'05d') +'.png'
             plt.savefig(FigName, dpi=OutDPI)
             if not DisplayHoldout:
                 plt.close()

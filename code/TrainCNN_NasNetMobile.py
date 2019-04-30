@@ -43,10 +43,10 @@ from skimage.filters.rank import median, entropy
 #############################################################
 """User data input. Fill in the info below before running"""
 #############################################################
-TrainPath = "C:\\DATA\\DeepRiverscapes\\TrainingFinal\\"  #Watch the \\ and if there is a bug go to single quotes
+TrainPath = "Empty"  #Watch the \\ and if there is a bug go to single quotes
 
 
-RiverName1 = "StMarg"  #
+RiverName1 = "Empty"  #
 RiverName2 = "Empty"  # 
 RiverName3 = "Empty"  # 
 RiverName4 = "Empty"
@@ -66,7 +66,7 @@ RiverName12 = "Empty"
 size = 50 # Size of the tiles.  This should not change.
 NClasses = 5 
 
-BiggestImage = 32000 #Enter the number, can be approximate but bigger, of the last image
+BiggestImage = 9999 #Enter the number, can be approximate but bigger, of the last image
 RecogThresh = 0 #threshold of probability in the convnet return to consider as a detection
 BatchSize = 100
 
@@ -85,7 +85,7 @@ TuningSubSamp = 0.5 # Subsample of data, 0-1, to be used in tuning.
 TrainingEpochs = 25
 
 #Output name for the model and class key.  They will be saved in the training folder
-ModelName = 'NASNetMobile_50x_5riv_25ep' #no extensions
+ModelName = 'Empty' #no extensions
 
 
 ##################################################################

@@ -40,7 +40,6 @@ python C:\MyCode\SelfSupervisedClassification.py
 will execute the script from a prompt provided the code path is correct.  The easiest option remains the use Spyder to edit, save and execute the directly from the editor (Hotkey: F5). 
 
 ![GitHub_StMarg27170](https://user-images.githubusercontent.com/47110600/56954378-8bd66380-6b36-11e9-8396-8ba150c4c4aa.png)
-
 *Figure 1. Sample 4-part output*
 
 ### Report Compilation
@@ -48,7 +47,6 @@ The SSC execution will result 3 files per classified image: separate classificat
 
 
 ![GitHub_SSCample](https://user-images.githubusercontent.com/47110600/56954483-c809c400-6b36-11e9-8d1a-fa19647ba524.png)
-
 *Figure 2. Sample of results as violin plots.  Here we show the outputs for the Ouelle river in Canada*
 
 

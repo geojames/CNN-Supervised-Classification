@@ -5,9 +5,10 @@ Created on Sat Jul 21 09:33:42 2018
 @author: dgg0pc
 
 Compile classification reports
-this utility runs through the individual outputs of SelfSupervisedClassification and compiles
-the results into a single spreadsheet with a column structure that 
-works well with Seaborn switches for hues and other visualisation options
+this utility runs through the individual outputs of SelfSupervisedClassification and 
+compiles the results into a single spreadsheet with a column structure that 
+works well with Pandas row selection and Seaborn switches 
+for hues and other visualisation options
 """
 
 ###############################################################################
@@ -23,12 +24,11 @@ import os.path
 """User data input. Fill in the info below before running"""
 #############################################################
 
-ScorePath = "C:\\DATA\\DeepRiverscapes\\SingleRiver\\"
-#ExperimentName = 'Kurobe'
-Experiment = '1river'
-model = 'NasNetLarge'
-Phase2Type = 'MLP' #indicate wether the phase 2 ML algorithm was RF or MLP
-TestRiverName1 = "Kurobe"  #
+ScorePath = "Empty"
+Experiment = 'Empty'
+model = 'Empty'
+Phase2Type = 'Empty' #indicate wether the phase 2 ML algorithm was RF or MLP
+TestRiverName1 = "Empty"  #
 TestRiverName2 = "Empty"  # 
 TestRiverName3 = "Empty"  # 
 TestRiverName4 = "Empty"

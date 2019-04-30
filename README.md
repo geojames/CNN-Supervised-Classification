@@ -26,10 +26,21 @@ will work from an Ipython console and:
 ```
 python C:\MyCode\TrainCNN_NASNetLarge.py
 ```
-will execute the script from a prompt provided the code path is correct
+will execute the script from a prompt provided the code path is correct.  The easiest option is to use Spyder to edit, save and execute the directly from the editor (Hotkey: F5). Note that in this case you must be sure that dependencies are correctly installed for use by Spyder.  You may need to re-install another version of Spyder in the TensorFlow environment.
 
 ### SSC execution
-Once a trained CNN model is in place, SSC performance can be evaluated with SelfSupervisedClassification.py.  The images to test must follow the same naming convention and all have an existing set of manual labels used to calculate validation statistics.  These should not be the same images as used to train the CNN.  Once the numerous parameters have been adjusted (seee citation), the script will execute and output performance metrics for each image.  csv files with a CNN_ prefix give performance metrics for the CNN model with F1 scores and support (# of pixels) for each class.  SSC_ files give the same metrics for the final SSC result after the application of the MLP or the Random Forest selected in the options. A 4-part figure will also be output showing the original image, the existing class labels, the CNN classification and the final SSC classification labelled either MLP or RF.
+Once a trained CNN model is in place, SSC performance can be evaluated with SelfSupervisedClassification.py.  The images to test must follow the same naming convention and all have an existing set of manual labels as used in the CNN training phase above.   Again variables currently set to Empty must be edited in the code.  At least 1 of 12 TestRiverNames must be specified.  Current parameters are consistent with scripts for CNN training and should work as such.  The SSC is currently set to use a Multilayer Perceptron (MLP) to perform the phase 2, pixel-level, classification.  In this phase, the CNN classification output for a specific image will be used as training data for that specific image.  The script will execute and output performance metrics for each image.  csv files with a CNN_ prefix give performance metrics for the CNN model with F1 scores and support (# of pixels) for each class.  MLP_ or RF_ files give the same metrics for the final SSC result after the application of the MLP or the Random Forest (RF) selected in the options. A 4-part figure will also be output showing the original image, the existing class labels, the CNN classification and the final SSC classification labelled either MLP or RF. Once these options are edited in the code, once again no switches are required. e.g. :
+```
+SelfSupervisedClassification
+```
+will work from an Ipython console and:
+```
+python C:\MyCode\SelfSupervisedClassification.py
+```
+will execute the script from a prompt provided the code path is correct.  The easiest option remains the use Spyder to edit, save and execute the directly from the editor (Hotkey: F5). 
+
+### Report Compilation
+The SSC execution will result 3 files per classified image: separate classification score files for for the CNN and MLP (or RF) stages and an image file showing the input image, the validation data, the CNN classification (used sas training data for the next step) and the MLP (or RF) classification. CompileClassificationReports.py can be edited and executed in a similar way and will output a single csv file whose format is intended for use with Pandas and Seaborn for visualisation.  
 
 
 

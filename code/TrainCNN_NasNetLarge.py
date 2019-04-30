@@ -44,7 +44,7 @@ from IPython import get_ipython
 #############################################################
 """User data input. Fill in the info below before running"""
 #############################################################
-TrainPath = ""  #Watch the \\ and if there is a bug go to single quotes
+TrainPath = "Empty"  #Watch the \\ and if there is a bug go to single quotes
  
 
 RiverName1 = "Empty"  #

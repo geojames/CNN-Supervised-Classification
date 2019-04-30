@@ -49,7 +49,7 @@ The SSC execution will result 3 files per classified image: separate classificat
 
 ![GitHub_SSCample](https://user-images.githubusercontent.com/47110600/56954483-c809c400-6b36-11e9-8d1a-fa19647ba524.png)
 
-*Figure 2. Sample of results as violin plots.  Here we show the outputs for the Ouelle river in Canada
+*Figure 2. Sample of results as violin plots.  Here we show the outputs for the Ouelle river in Canada*
 
 
 ## Authors:

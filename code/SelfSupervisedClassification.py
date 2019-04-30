@@ -462,10 +462,10 @@ for f in range(0,len(TestRiverTuple)):
             #print(metrics.confusion_matrix(Class, PredictedImageVECT))
             print('\n')
             if MLP:
-                SSCname = ScorePath + 'SSC_MLP_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
+                SSCname = ScorePath + 'MLP_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
                 classification_report_csv(reportSSC, SSCname)
             else:
-                SSCname = ScorePath + 'SSC_RF_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
+                SSCname = ScorePath + 'RF_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
                 classification_report_csv(reportSSC, SSCname)
             CNNname = ScorePath + 'CNN_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
             classification_report_csv(reportCNN, CNNname)            

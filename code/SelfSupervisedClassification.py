@@ -470,7 +470,7 @@ for f in range(0,len(TestRiverTuple)):
             CNNname = ScorePath + 'CNN_' + TestRiverTuple[f] + format(i,'05d') +  '_' + ExperimentName + '.csv'    
             classification_report_csv(reportCNN, CNNname)            
             
-            #Display results
+            #Display and/or oputput figure results
             #PredictedImage = PredictedPixels.reshape(Entropy.shape[0], Entropy.shape[1])
             for c in range(0,6): #this sets 1 pixel to each class to standardise colour display
                 ClassIm[c,0] = c
@@ -504,7 +504,7 @@ for f in range(0,len(TestRiverTuple)):
                 plt.xlabel('Self-Supervised Classification (MLP). F1: ' + GetF1(reportSSC), fontweight='bold' )
             else:
                 plt.xlabel('Self-Supervised Classification (RF). F1: ' + GetF1(reportSSC), fontweight='bold' )
-            FigName = ScorePath + 'SSC_' + 'OutFig_' + TestRiverTuple[f] + format(i,'05d') +'.png'
+            FigName = ScorePath + 'SSC_'+  ExperimentName + '_'+ TestRiverTuple[f] + format(i,'05d') +'.png'
             plt.savefig(FigName, dpi=OutDPI)
             if not DisplayHoldout:
                 plt.close()

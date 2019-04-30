@@ -45,6 +45,7 @@ The SSC execution will result 3 files per classified image: separate classificat
 
 
 
+
 ## Authors:
  - Patrice E. Carbonneau, University of Durham, [e-mail](mailto:patrice.carbonneau@durham.ac.uk)
  - Toby P. Breckon, University of Durham

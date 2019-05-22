@@ -1,10 +1,44 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#------------------------------------------------------------------------------
+__author__ = 'Patrice Carbonneau'
+__contact__ = 'patrice.carbonneau@durham.ac.uk'
+__copyright__ = '(c) Patrice Carbonneau'
+__license__ = 'MIT'
+__date__ = '15 APR 2019'
+__version__ = '1.1'
+__status__ = "initial release"
+__url__ = "https://github.com/geojames/Self-Supervised-Classification"
+
 """
-Created on Fri Jul 20 10:44:16 2018
+Name:           TrainCNN_NasNetLarge.py
+Compatibility:  Python 3.7
+Description:    This file trains and outputs a NASNet Large model to for the 
+                task of river classification from RGB images
 
-@author: Patrice Carbonneau
+Requires:       keras, numpy, pandas, matplotlib, skimage, sklearn
 
-This file trains and outputs a NASNet Large model to for the task of river classification.
+Dev Revisions:  JTD - 19/4/19 - Updated file paths, added auto detection of
+                    river names from input images, improved image reading loops
+
+Licence:        MIT
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to do 
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all 
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+SOFTWARE.
 """
 
 from keras import layers
@@ -32,7 +66,8 @@ import copy
 from skimage.morphology import disk
 from skimage.filters.rank import median, entropy
 from IPython import get_ipython
-
+import glob
+import fnmatch
 
 #########################################################
 #Image loading and data preparation.
@@ -41,38 +76,26 @@ from IPython import get_ipython
 # 2 - Looks at the classification mask and when a tile is 90% classified, produces a label vector value. 0 if less than 90%
 # 3 - Feeds this into the NASNet Large convnet.  Level of trainability of the convnet can be set by user
 
-#############################################################
+#------------------------------------------------------------
 """User data input. Fill in the info below before running"""
-#############################################################
-TrainPath = "Empty"  #Watch the \\ and if there is a bug go to single quotes
- 
+#------------------------------------------------------------
 
-RiverName1 = "Empty"  #
-RiverName2 = "Empty"  # 
-RiverName3 = "Empty"  # 
-RiverName4 = "Empty"
-RiverName5 = "Empty"
-RiverName6 = "Empty"
-RiverName7 = "Empty"
-RiverName8 = "Empty"
-RiverName9 = "Empty"
-RiverName10 = "Empty"
-RiverName11 = "Empty"
-RiverName12 = "Empty"
+TrainPath = 'path'  #Watch the \\ and if there is a bug go to single quotes
 
-
-
+#Output name for the model.  It wil be saved in the training folder
+ModelName = 'EMPTY'      #no extensions
+ScorePath = 'path'          #where the model will be saved
 
 size = 50 # Size of the tiles.  This should not change.
 NClasses = 5 
 
-BiggestImage = 9999 #Enter the number, can be approximate but bigger, of the last image
+BiggestImage = 99999 #Enter the number, can be approximate but bigger, of the last image
 BatchSize = 100 #will depend on your GPU
 
 #use this option to train the model with a validation subset. Accuracy and loss checks will be displayed.
 #When the tuning is satisfactory, set to False and train with the whole dataset. Model will only be saved if this is set to False
 #When true the sript will exit with a system error and display loss/acc vs epoch figures.  This is intentional.
-ModelTuning = True
+ModelTuning = False
 TuningEpochs = 50 
 TuningSubSamp = 0.15 # Subsample of data, 0-1, to be used in tuning.
 
@@ -80,9 +103,16 @@ TuningSubSamp = 0.15 # Subsample of data, 0-1, to be used in tuning.
 #This is only used when ModelTuning is False.  
 TrainingEpochs = 4
 
-#Output name for the model.  It wil be saved in the training folder
-ModelName = '' #no extensions
-ScorePath = "" #where the model will be saved
+# create Score Directory if not present
+if os.path.exists(ScorePath) == False:
+    os.mkdir(ScorePath)
+
+# Path checks- checks for folder ending slash, adds if nessesary
+if ('/' or "'\'") not in TrainPath[-1]:
+    TrainPath = TrainPath + '/'
+
+if ('/' or "'\'") not in ScorePath[-1]:
+    ScorePath = ScorePath +'/'
 
 ##################################################################
 """ HELPER FUNCTIONS SECTION"""
@@ -178,9 +208,9 @@ def class_prediction_to_image(im, PredictedTiles, size):
     
 ################################################################################
 #Keep track of the new classes in a Pandas DataFrame
-def MakePandasKey(ClassKey, RiverTuple, NClasses, f):
+def MakePandasKey(ClassKey, NClasses, f, r):
     for c in range(1,NClasses+1):
-        ClassKey['River'].loc[c+(f*NClasses)] = RiverTuple[f]
+        ClassKey['River'].loc[c+(f*NClasses)] = r
         ClassKey['LocalClass'].loc[c+(f*NClasses)] = (f*NClasses+1) + (c-1)
         ClassKey['HierarchClass'].loc[c+(f*NClasses)] = 1 + (c-1)
         if c==1:
@@ -204,24 +234,42 @@ def SimplifyClass(ClassImage, ClassKey):
         Hclass = KeyIndex.iloc[0]['HierarchClass']
         ClassImage[ClassImage == Iclasses[c]] = Hclass
     return ClassImage
-            
-        
+
+###############################################################################
+# Checks            
+def checkInputImgNames(path):
+    # Glob list fo all jpg images
+    img = glob.glob(path+"*.jpg")
+
+    # test file names using fnmatch fo a 5-digit number
+    #   if aone false, raise an exception and kill everything 
+    for im in img:
+        if fnmatch.fnmatch(im,'*_[0-9][0-9][0-9][0-9]*.jpg') == False:       
+            raise Exception("Image: %s is not in the correct format. All images need to have a five digit number after the RiverName, eg RiverName_00000.jpg"%(os.path.basename(im)))
+            sys.exit(1)
     
 
 ###############################################################################
 """Data Preparation Section"""
 ###############################################################################    
 
+# Check Files Name Pattern
+checkInputImgNames(TrainPath)
 
-RiverTuple = (RiverName1, RiverName2, RiverName3, RiverName4, RiverName5,
-                  RiverName6, RiverName7, RiverName8, RiverName9, RiverName10,
-                  RiverName11, RiverName12)
+# Getting River Names from the files
+# Glob list fo all jpg images, get unique names form the total list
+img = glob.glob(TrainPath + "*.jpg")
+RiverTuple = []
+for im in img:
+    RiverTuple.append(os.path.basename(im).partition('_')[0])
+RiverTuple = np.unique(RiverTuple)
 
+# Get training class images
+class_img = glob.glob(TrainPath + "SCLS_*.tif*")
 
-#shave the empty slots off of RiverTuple
-for r in range(11,0, -1):
-    if 'Empty' in RiverTuple[r]:
-        RiverTuple = RiverTuple[0:r]
+if len(img) != len(class_img):
+    raise Exception("Training and Classified Images Counts do not match, Please Double-check and Rerun")
+    sys.exit(1)
 
 
 ClassKeyDict ={'LocalClass': np.zeros(1+(len(RiverTuple)*5)).ravel(), 'HierarchClass' : np.zeros(1+(len(RiverTuple)*5)).ravel()} 
@@ -229,51 +277,41 @@ ClassKey = pd.DataFrame(ClassKeyDict)
 ClassKey['River'] = ""
 ClassKey['ClassName'] = ""
 
-
-
 LocalClasses = np.int16(NClasses*len(RiverTuple))  
 ImageTensor = np.zeros((1,size,size,3))
 LabelTensor = np.zeros((1,(NClasses*len(RiverTuple))+1))
    
-for f in range(0,len(RiverTuple)):
-    ClassKey = MakePandasKey(ClassKey, RiverTuple, NClasses, f)
-    for i in range(0,BiggestImage):  
-        ImagePath = TrainPath + RiverTuple[f] + format(i,'05d') +'.jpg'
-        ClassPath =  TrainPath + 'SCLS_' + RiverTuple[f] + format(i,'05d') + '.tif' #watch image format types
-        if os.path.exists(ClassPath):
-            print('processing image '+ImagePath)
-            Im3D = io.imread(ImagePath)
-            if len(Im3D) == 2:
-                Im3D = Im3D[0]
+for f,riv in enumerate(RiverTuple):
+    ClassKey = MakePandasKey(ClassKey, NClasses, f, riv)
+    for i,im in enumerate(img):  
+        print('processing image ' + os.path.basename(im))
+        Im3D = io.imread(im)
+        if len(Im3D) == 2:
+            Im3D = Im3D[0]
 
-            Class = io.imread(ClassPath, as_grey=True)
-            if Im3D.shape[0] != Class.shape[0]:
-                sys.exit("Error, Image and class mask do not have the same dimensions")
-                
-            NewClass = Class + f*NClasses #Transform macro-class from the classification 1 to N where N is the number of classes to micro-classes.
-            NewClass[Class == 0] = 0 #this step avoids the unclassified areas becoming class f*(NClasses)
-            Class = copy.deepcopy(NewClass)
-            ImCrop = CropToTile (Im3D, size)
-            ClsCrop =  CropToTile (Class, size)           
-            I_tiles = split_image_to_tiles(ImCrop, size)
-            I_tiles = np.int16(I_tiles) / 255
-            C_tiles = split_image_to_tiles(ClsCrop, size)
-            CLabelVector, ClassifiedTiles = PrepareTensorData(I_tiles, C_tiles, size)
-            Label1hot= to_categorical(CLabelVector, num_classes = LocalClasses+1) #convert to one-hot encoding
-            ImageTensor = np.concatenate((ImageTensor,ClassifiedTiles), axis = 0)
-            LabelTensor = np.concatenate((LabelTensor, Label1hot), axis = 0)
-            del(ImCrop,ClsCrop,I_tiles, C_tiles, Label1hot, Class, NewClass, Im3D, CLabelVector, ClassifiedTiles)
+        Class = io.imread(class_img[i], as_gray=True)
+        if Im3D.shape[0] != Class.shape[0]:
+            sys.exit("Error, Image and class mask do not have the same dimensions")
             
-
-#
-                
-
+        NewClass = Class + f*NClasses #Transform macro-class from the classification 1 to N where N is the number of classes to micro-classes.
+        NewClass[Class == 0] = 0 #this step avoids the unclassified areas becoming class f*(NClasses)
+        Class = copy.deepcopy(NewClass)
+        ImCrop = CropToTile (Im3D, size)
+        ClsCrop =  CropToTile (Class, size)           
+        I_tiles = split_image_to_tiles(ImCrop, size)
+        I_tiles = np.int16(I_tiles) / 255
+        C_tiles = split_image_to_tiles(ClsCrop, size)
+        CLabelVector, ClassifiedTiles = PrepareTensorData(I_tiles, C_tiles, size)
+        Label1hot= to_categorical(CLabelVector, num_classes = LocalClasses+1) #convert to one-hot encoding
+        ImageTensor = np.concatenate((ImageTensor,ClassifiedTiles), axis = 0)
+        LabelTensor = np.concatenate((LabelTensor, Label1hot), axis = 0)
+        del(ImCrop,ClsCrop,I_tiles, C_tiles, Label1hot, Class, NewClass, Im3D, CLabelVector, ClassifiedTiles)
+            
 
 #Delete the first blank tile from initialisation
 ImageTensor = ImageTensor[1:,:,:,:]
 LabelTensor = LabelTensor[1:,:]
 print(str(ImageTensor.shape[0]) + ' image tiles of ' + str(size) + ' X ' + str(size) + ' extracted')    
-
            
 
 ##########################################################
@@ -281,7 +319,7 @@ print(str(ImageTensor.shape[0]) + ' image tiles of ' + str(size) + ' X ' + str(s
 ##########################################################
 #Setup the convnet and add dense layers
 
-conv_base = nasnet.NASNetLarge(weights='imagenet', include_top = False, input_shape = (size,size,3))
+conv_base = nasnet.NASNetLarge(weights='imagenet', input_shape = (size,size,3),include_top = False)
 
 model = models.Sequential()
 model.add(conv_base)

@@ -1,11 +1,45 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#------------------------------------------------------------------------------
+__author__ = 'Patrice Carbonneau'
+__contact__ = 'patrice.carbonneau@durham.ac.uk'
+__copyright__ = '(c) Patrice Carbonneau'
+__license__ = 'MIT'
+__date__ = '15 APR 2019'
+__version__ = '1.1'
+__status__ = "initial release"
+__url__ = "https://github.com/geojames/Self-Supervised-Classification"
+
 """
-Created on Sat Jul 21 09:33:42 2018
+Name:           TrainCNN_NasNetMobile.py
+Compatibility:  Python 3.7
+Description:    Performs Self-Supervised Image CLassification with a 
+                pre-trained Convolutional Neural Network model.
+                User options are in the first section of code.
 
-@author: Patrice Carbonneau
+Requires:       keras, numpy, pandas, matplotlib, skimage, sklearn
 
-Performs Self-Supervised Image CLassification with a pre-trained Convolutional Neural Network model.
-User options are in the first section of code.
+Dev Revisions:  JTD - 19/4/19 - Updated file paths, added auto detection of
+                    river names from input images, improved image reading loops
+
+Licence:        MIT
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to do 
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all 
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+SOFTWARE.
 """
 
 ###############################################################################
@@ -34,7 +68,7 @@ from imblearn.combine import SMOTEENN
 import copy
 import sys
 from IPython import get_ipython #this can be removed if not using Spyder
-
+import glob
 
 
 
@@ -42,29 +76,14 @@ from IPython import get_ipython #this can be removed if not using Spyder
 """User data input. Fill in the info below before running"""
 #############################################################
 
-ModelPath = "Empty"  #should be the training path from previous run of TrainCNN_
-PredictPath = "Empty" #Location of the images
-ModelName = 'Empty'   #The retrained convnet to use, do not specify extension. Must be located in ModelPath
-ScorePath = "Empty" #location of the output files
-Experiment = 'Empty' #ID to append to output performance files
+ModelPath = 'path'      #should be the training path from previous run of TrainCNN_
+PredictPath = 'path'    #Location of the images
+ModelName = 'EMPTY'     #The retrained convnet to use, do not specify extension. Must be located in ModelPath
+ScorePath = 'path'      #location of the output files
+Experiment = 'EMPTY'    #ID to append to output performance files
 
 
-TestRiverName1 = "Empty"  #
-TestRiverName2 = "Empty"  # 
-TestRiverName3 = "Empty"  # 
-TestRiverName4 = "Empty"
-TestRiverName5 = "Empty"
-TestRiverName6 = 'Empty'
-TestRiverName7 = "Empty"
-TestRiverName8 = "Empty"
-TestRiverName9 = "Empty"
-TestRiverName10 = "Empty"
-TestRiverName11 = "Empty"
-TestRiverName12 = "Empty"
-
-
-
-UseSmote = False#Turn SMOTE-ENN resampling on and off
+UseSmote = False #Turn SMOTE-ENN resampling on and off
 size = 50 # Size of the tiles.  This MUST be the same as the tile size used to retrain the model
 MinTiles = 0 #The minimum number of contiguous tiles of size 'size' to consider as a significnat element in the image.  
 NClasses = 5  #The number of classes in the data. This MUST be the same as the classes used to retrain the model
@@ -93,6 +112,21 @@ SmallestElement = 10 # Despeckle the classification to the smallest length in pi
 #in both cases, a png version will be saved to disk
 DisplayHoldout =  False
 OutDPI = 300 #Recommended 300 for inspection 1200 for papers, at 1200 this results in 15Mb per output figure.  
+
+
+# Path checks- checks for folder ending slash, adds if nessesary
+if ('/' or "'\'") not in ModelPath[-1]:
+    ModelPath = ModelPath + '/'
+
+if ('/' or "'\'") not in PredictPath[-1]:
+    PredictPath = PredictPath + '/'   
+
+if ('/' or "'\'") not in ScorePath[-1]:
+    ScorePath = ScorePath +'/'
+    
+# create Score Directory if not present
+if os.path.exists(ScorePath) == False:
+    os.mkdir(ScorePath)
 
 #####################################################################################################################
 
@@ -324,200 +358,190 @@ ClassKey = pd.read_csv(ClassKeyPath)
 ###############################################################################
 """Classify the holdout images with Self-Supervised Classification"""
 
-TestRiverTuple = (TestRiverName1, TestRiverName2, TestRiverName3, TestRiverName4, TestRiverName5,
-                  TestRiverName6, TestRiverName7, TestRiverName8, TestRiverName9, TestRiverName10,
-                  TestRiverName11, TestRiverName12)
+# Getting River Names from the files
+# Glob list fo all jpg images, get unique names form the total list
+img = glob.glob(PredictPath+"*.jpg")
+TestRiverTuple = []
+for im in img:
+    TestRiverTuple.append(os.path.basename(im).partition('_')[0])
+TestRiverTuple = np.unique(TestRiverTuple)
 
-#shave the empty slots off of RiverTuple
-for r in range(11,0, -1):
-    if 'Empty' in TestRiverTuple[r]:
-        TestRiverTuple = TestRiverTuple[0:r]
+# Get training class images (covers tif and tiff file types)
+class_img = glob.glob(PredictPath + "SCLS_*.tif*")
 
-for f in range(0,len(TestRiverTuple)):
-  
-    for i in range(FirstImage,BiggestImage): #Image numbers up to 99999. But excess figures will crash Spyder if you actually have 1000
-        ImagePath = PredictPath + TestRiverTuple[f] + format(i,'05d') +'.jpg'
-        ClassPath = PredictPath + 'SCLS_' + TestRiverTuple[f] + format(i,'05d')  +'.tif' #watch image format types
-        if os.path.exists(ImagePath):
-            print('Self-supervised classification of ' + ImagePath)
-            Im3D = io.imread(ImagePath)
-            #print(isinstance(Im3D,uint8))
-            if len(Im3D) == 2:
-                Im3D = Im3D[0]
-            Class = io.imread(ClassPath, as_gray=True)
-            if (Class.shape[0] != Im3D.shape[0]) or (Class.shape[1] != Im3D.shape[1]):
-                print('WARNING: inconsistent image and class mask sizes for ' + ImagePath)
-                Class = T.resize(Class, (Im3D.shape[0], Im3D.shape[1]), preserve_range = True) #bug handling for vector
-            ClassIm = copy.deepcopy(Class)
-            #Tile the images to run the convnet
-            ImCrop = CropToTile (Im3D, size)
-            I_tiles = split_image_to_tiles(ImCrop, size)
-            I_tiles = np.int16(I_tiles) / 255
-            #Apply the convnet
-            print('Detecting self-supervised training areas')
-            PredictedTiles = ConvNetmodel.predict(I_tiles, batch_size = 32, verbose = Chatty)
-            #Convert the convnet one-hot predictions to a new class label image
-            PredictedTiles[PredictedTiles < RecogThresh] = 0
-            PredictedClass = class_prediction_to_image(Class, PredictedTiles, size)
-            PredictedClass = SimplifyClass(PredictedClass, ClassKey)
-            #Set classes to 0 if they do not have MinTiles detected by the CNN
-            
-            #for c in range(0,NClasses+1):
-            #    count = np.sum(PredictedClass.reshape(-1,1) == c)
-            #    if count <= MinTiles*size*size:
-            #        PredictedClass[PredictedClass == c] = 0
-            if MinTiles > 0:
-                PredictedClass = modal(np.uint8(PredictedClass), np.ones((2*MinTiles*size+1,2*MinTiles*size+1)))
-                #PredictedClass = modal(np.uint8(PredictedClass), disk(2*(MinTiles*size*size)+1))
+
+for f,riv in enumerate(TestRiverTuple):
+    for i,im in enumerate(img): 
+        print('Self-supervised classification of ' + os.path.basename(im))
+        Im3D = io.imread(im)
+        #print(isinstance(Im3D,uint8))
+        if len(Im3D) == 2:
+            Im3D = Im3D[0]
+        Class = io.imread(class_img[i], as_gray=True)
+        if (Class.shape[0] != Im3D.shape[0]) or (Class.shape[1] != Im3D.shape[1]):
+            print('WARNING: inconsistent image and class mask sizes for ' + im)
+            Class = T.resize(Class, (Im3D.shape[0], Im3D.shape[1]), preserve_range = True) #bug handling for vector
+        ClassIm = copy.deepcopy(Class)
+        #Tile the images to run the convnet
+        ImCrop = CropToTile (Im3D, size)
+        I_tiles = split_image_to_tiles(ImCrop, size)
+        I_tiles = np.int16(I_tiles) / 255
+        #Apply the convnet
+        print('Detecting self-supervised training areas')
+        PredictedTiles = ConvNetmodel.predict(I_tiles, batch_size = 32, verbose = Chatty)
+        #Convert the convnet one-hot predictions to a new class label image
+        PredictedTiles[PredictedTiles < RecogThresh] = 0
+        PredictedClass = class_prediction_to_image(Class, PredictedTiles, size)
+        PredictedClass = SimplifyClass(PredictedClass, ClassKey)
+        #Set classes to 0 if they do not have MinTiles detected by the CNN
+        
+        #for c in range(0,NClasses+1):
+        #    count = np.sum(PredictedClass.reshape(-1,1) == c)
+        #    if count <= MinTiles*size*size:
+        #        PredictedClass[PredictedClass == c] = 0
+        if MinTiles > 0:
+            PredictedClass = modal(np.uint8(PredictedClass), np.ones((2*MinTiles*size+1,2*MinTiles*size+1)))
+            #PredictedClass = modal(np.uint8(PredictedClass), disk(2*(MinTiles*size*size)+1))
 								
-            #Prep the pixel data from the cropped image and new class label image
-            print('Processing Entropy and Median filter')
-            Entropy = entropy(Im3D[:,:,0], selem = np.ones([11,11]), shift_x = 3,  shift_y = 0)
-            MedImage = ColourFilter(Im3D) #Median filter on all 3 bands
-            rv = MedImage[:,:,0].reshape(-1,1)#Split and vectorise the bands
-            gv = MedImage[:,:,1].reshape(-1,1)
-            bv = MedImage[:,:,2].reshape(-1,1)
-            #Vectorise the bands, use the classification prdicted by the CNN
-            #m = np.ndarray.flatten(PredictedClass).reshape(-1,1) 
-            #rv = np.ndarray.flatten(r).reshape(-1,1)
-            #gv = np.ndarray.flatten(g).reshape(-1,1)
-            #bv = np.ndarray.flatten(b).reshape(-1,1)
-            #Entropyv = np.ndarray.flatten(Entropy).reshape(-1,1)
-            m = PredictedClass.reshape(-1,1) 
-            Entropyv = Entropy.reshape(-1,1)
+        #Prep the pixel data from the cropped image and new class label image
+        print('Processing Entropy and Median filter')
+        Entropy = entropy(Im3D[:,:,0], selem = np.ones([11,11]), shift_x = 3,  shift_y = 0)
+        MedImage = ColourFilter(Im3D) #Median filter on all 3 bands
+        rv = MedImage[:,:,0].reshape(-1,1)#Split and vectorise the bands
+        gv = MedImage[:,:,1].reshape(-1,1)
+        bv = MedImage[:,:,2].reshape(-1,1)
+        #Vectorise the bands, use the classification prdicted by the CNN
+        #m = np.ndarray.flatten(PredictedClass).reshape(-1,1) 
+        #rv = np.ndarray.flatten(r).reshape(-1,1)
+        #gv = np.ndarray.flatten(g).reshape(-1,1)
+        #bv = np.ndarray.flatten(b).reshape(-1,1)
+        #Entropyv = np.ndarray.flatten(Entropy).reshape(-1,1)
+        m = PredictedClass.reshape(-1,1) 
+        Entropyv = Entropy.reshape(-1,1)
+        
+
+        ColumnDat = np.concatenate((rv,gv,bv,Entropyv,m), axis = 1)
+        #Rescale the data for the fitting work
+        SCAL = StandardScaler()
+        ScaledValues = SCAL.fit_transform(ColumnDat[:,0:-1])
+        ColumnDat[:,0:-1] = ScaledValues
+        #Eliminate the zeros in the mask from minimum tiles
+        ColumnDat = ColumnDat[ColumnDat[:,4]!=0]
+        
+        m=ColumnDat[:,-1]
+        #Build the predictor from the CNN classified mask
+        #Subsample the pixels
+        sample_size = np.int64(SubSample * ColumnDat.shape[0])
+        if (sample_size < MinSample) and (ColumnDat.shape[0] > MinSample):
+            sample_size = MinSample
+        elif (sample_size < MinSample) and (ColumnDat.shape[0] < MinSample):
+            sample_size = ColumnDat.shape[0]
+            print('WARNING: small sample size for predictor fit')
+        idx = np.random.randint(low = 1, high = int(len(ColumnDat)-1), size=sample_size) #using numpy so should be fast
+        ColumnDat = ColumnDat[idx,:]
+        X_presmote = ColumnDat[:,0:4] 
+        Y_presmote = ColumnDat[:,4]
+        if UseSmote and len(np.unique(Y_presmote))>1: #SMOTE doesn't work with 1 class 
+            print('Correcting class imbalance with SMOTE-ENN')
+            smote_enn = SMOTEENN(sampling_strategy ='auto', random_state=0)
+            X, Y = smote_enn.fit_resample(X_presmote, Y_presmote)
+        else:
+            print('not using SMOTE methods')
+            X = X_presmote
+            Y = Y_presmote     
+
+        
+        if MLP:
+            print('Fitting MLP Classifier on ' + str(len(X)) + ' pixels')
+            EstimatorNN.fit(X, Y)
+        else:
+            print('Fitting Random Forest Classifier on ' + str(len(X)) + ' pixels')
+            EstimatorRF.fit(X, Y)
+            
+        #Fit the predictor to all pixels
+        FullDat = np.concatenate((rv,gv,bv,Entropyv), axis = 1)
+        del(rv,gv,bv,Entropyv, MedImage)
+        SCAL = StandardScaler()
+        ScaledValues = SCAL.fit_transform(FullDat)
+        if MLP:
+            PredictedPixels = EstimatorNN.predict(ScaledValues)
+        else:
+            PredictedPixels = EstimatorRF.predict(ScaledValues)
+        
+        #Reshape the predictions to image format and display
+        PredictedImage = PredictedPixels.reshape(Entropy.shape[0], Entropy.shape[1])
+        if SmallestElement > 0:
+            PredictedImage = modal(np.uint8(PredictedImage), disk(2*SmallestElement+1)) #clean up the class with a mode filter
+
+
+        #Produce classification reports 
+        Class = Class.reshape(-1,1)
+        PredictedImageVECT = PredictedImage.reshape(-1,1) #This is the pixel-based prediction
+        PredictedClassVECT = PredictedClass.reshape(-1,1) # This is the CNN tiles prediction
+        PredictedImageVECT = PredictedImageVECT[Class != 0]
+        PredictedClassVECT = PredictedClassVECT[Class != 0]
+        Class = Class[Class != 0]
+        Class = np.int32(Class)
+        PredictedImageVECT = np.int32(PredictedImageVECT)
+        reportSSC = metrics.classification_report(Class, PredictedImageVECT, digits = 3)
+        reportCNN = metrics.classification_report(Class, PredictedClassVECT, digits = 3)
+        print('CNN tiled classification results for ' + os.path.basename(im))
+        print(reportCNN)
+        print('\n')
+        print('Self-Supervised classification results for ' + os.path.basename(im))
+        print(reportSSC)
+        #print('Confusion Matrix:')
+        #print(metrics.confusion_matrix(Class, PredictedImageVECT))
+        print('\n')
+        if MLP:
+            SSCname = ScorePath + 'MLP_' + os.path.basename(im)[:-4] + '_' + Experiment + '.csv'    
+            classification_report_csv(reportSSC, SSCname)
+        else:
+            SSCname = ScorePath + 'RF_' + os.path.basename(im)[:-4] +  '_' + Experiment + '.csv'    
+            classification_report_csv(reportSSC, SSCname)
+        CNNname = ScorePath + 'CNN_' + os.path.basename(im)[:-4] + '_' + Experiment + '.csv'    
+        classification_report_csv(reportCNN, CNNname)            
+        
+        #Display and/or oputput figure results
+        #PredictedImage = PredictedPixels.reshape(Entropy.shape[0], Entropy.shape[1])
+        for c in range(0,6): #this sets 1 pixel to each class to standardise colour display
+            ClassIm[c,0] = c
+            PredictedClass[c,0] = c
+            PredictedImage[c,0] = c
+        #get_ipython().run_line_magic('matplotlib', 'qt')
+        plt.figure(figsize = (12, 9.5)) #reduce these values if you have a small screen
+        plt.subplot(2,2,1)
+        plt.imshow(Im3D)
+        plt.title('Classification results for ' + os.path.basename(im), fontweight='bold')
+        plt.xlabel('Input RGB Image', fontweight='bold')
+        plt.subplot(2,2,2)
+        cmapCHM = colors.ListedColormap(['black','lightblue','orange','green','yellow','red'])
+        plt.imshow(ClassIm, cmap=cmapCHM)
+        plt.xlabel('Validation Labels', fontweight='bold')
+        class0_box = mpatches.Patch(color='black', label='Unclassified')
+        class1_box = mpatches.Patch(color='lightblue', label='Water')
+        class2_box = mpatches.Patch(color='orange', label='Sediment')
+        class3_box = mpatches.Patch(color='green', label='Green Veg.')
+        class4_box = mpatches.Patch(color='yellow', label='Senesc. Veg.')
+        class5_box = mpatches.Patch(color='red', label='Paved Road')
+        ax=plt.gca()
+        ax.legend(handles=[class0_box, class1_box,class2_box,class3_box,class4_box,class5_box])
+        plt.subplot(2,2,3)
+        plt.imshow(PredictedClass, cmap=cmapCHM)
+        plt.xlabel('CNN tiles Classification. F1: ' + GetF1(reportCNN), fontweight='bold')
+        plt.subplot(2,2,4)
+        cmapCHM = colors.ListedColormap(['black', 'lightblue','orange','green','yellow','red'])
+        plt.imshow(PredictedImage, cmap=cmapCHM)
+        if MLP:
+            plt.xlabel('Self-Supervised Classification (MLP). F1: ' + GetF1(reportSSC), fontweight='bold' )
+        else:
+            plt.xlabel('Self-Supervised Classification (RF). F1: ' + GetF1(reportSSC), fontweight='bold' )
+        FigName = ScorePath + 'SSC_'+  Experiment + '_'+ os.path.basename(im)[:-4] +'.png'
+        plt.savefig(FigName, dpi=OutDPI)
+        if not DisplayHoldout:
+            plt.close()
             
 
-            ColumnDat = np.concatenate((rv,gv,bv,Entropyv,m), axis = 1)
-            #Rescale the data for the fitting work
-            SCAL = StandardScaler()
-            ScaledValues = SCAL.fit_transform(ColumnDat[:,0:-1])
-            ColumnDat[:,0:-1] = ScaledValues
-            #Eliminate the zeros in the mask from minimum tiles
-            ColumnDat = ColumnDat[ColumnDat[:,4]!=0]
-            
-            m=ColumnDat[:,-1]
-            #Build the predictor from the CNN classified mask
-            #Subsample the pixels
-            sample_size = np.int64(SubSample * ColumnDat.shape[0])
-            if (sample_size < MinSample) and (ColumnDat.shape[0] > MinSample):
-                sample_size = MinSample
-            elif (sample_size < MinSample) and (ColumnDat.shape[0] < MinSample):
-                sample_size = ColumnDat.shape[0]
-                print('WARNING: small sample size for predictor fit')
-            idx = np.random.randint(low = 1, high = int(len(ColumnDat)-1), size=sample_size) #using numpy so should be fast
-            ColumnDat = ColumnDat[idx,:]
-            X_presmote = ColumnDat[:,0:4] 
-            Y_presmote = ColumnDat[:,4]
-            if UseSmote and len(np.unique(Y_presmote))>1: #SMOTE doesn't work with 1 class 
-                print('Correcting class imbalance with SMOTE-ENN')
-                smote_enn = SMOTEENN(sampling_strategy ='auto', random_state=0)
-                X, Y = smote_enn.fit_resample(X_presmote, Y_presmote)
-            else:
-                print('not using SMOTE methods')
-                X = X_presmote
-                Y = Y_presmote
-                
-                    
-             
-
-            
-            if MLP:
-                print('Fitting MLP Classifier on ' + str(len(X)) + ' pixels')
-                EstimatorNN.fit(X, Y)
-            else:
-             
-                print('Fitting Random Forest Classifier on ' + str(len(X)) + ' pixels')
-                EstimatorRF.fit(X, Y)
-                
-            #Fit the predictor to all pixels
-            FullDat = np.concatenate((rv,gv,bv,Entropyv), axis = 1)
-            del(rv,gv,bv,Entropyv, MedImage)
-            SCAL = StandardScaler()
-            ScaledValues = SCAL.fit_transform(FullDat)
-            if MLP:
-                PredictedPixels = EstimatorNN.predict(ScaledValues)
-            else:
-                PredictedPixels = EstimatorRF.predict(ScaledValues)
-            
-            #Reshape the predictions to image format and display
-            PredictedImage = PredictedPixels.reshape(Entropy.shape[0], Entropy.shape[1])
-            if SmallestElement > 0:
-                PredictedImage = modal(np.uint8(PredictedImage), disk(2*SmallestElement+1)) #clean up the class with a mode filter
-
-
-            #Produce classification reports 
-            Class = Class.reshape(-1,1)
-            PredictedImageVECT = PredictedImage.reshape(-1,1) #This is the pixel-based prediction
-            PredictedClassVECT = PredictedClass.reshape(-1,1) # This is the CNN tiles prediction
-            PredictedImageVECT = PredictedImageVECT[Class != 0]
-            PredictedClassVECT = PredictedClassVECT[Class != 0]
-            Class = Class[Class != 0]
-            Class = np.int32(Class)
-            PredictedImageVECT = np.int32(PredictedImageVECT)
-            reportSSC = metrics.classification_report(Class, PredictedImageVECT, digits = 3)
-            reportCNN = metrics.classification_report(Class, PredictedClassVECT, digits = 3)
-            print('CNN tiled classification results for ' + ImagePath)
-            print(reportCNN)
-            print('\n')
-            print('Self-Supervised classification results for ' + ImagePath)
-            print(reportSSC)
-            #print('Confusion Matrix:')
-            #print(metrics.confusion_matrix(Class, PredictedImageVECT))
-            print('\n')
-            if MLP:
-                SSCname = ScorePath + 'MLP_' + TestRiverTuple[f] + format(i,'05d') +  '_' + Experiment + '.csv'    
-                classification_report_csv(reportSSC, SSCname)
-            else:
-                SSCname = ScorePath + 'RF_' + TestRiverTuple[f] + format(i,'05d') +  '_' + Experiment + '.csv'    
-                classification_report_csv(reportSSC, SSCname)
-            CNNname = ScorePath + 'CNN_' + TestRiverTuple[f] + format(i,'05d') +  '_' + Experiment + '.csv'    
-            classification_report_csv(reportCNN, CNNname)            
-            
-            #Display and/or oputput figure results
-            #PredictedImage = PredictedPixels.reshape(Entropy.shape[0], Entropy.shape[1])
-            for c in range(0,6): #this sets 1 pixel to each class to standardise colour display
-                ClassIm[c,0] = c
-                PredictedClass[c,0] = c
-                PredictedImage[c,0] = c
-            #get_ipython().run_line_magic('matplotlib', 'qt')
-            plt.figure(figsize = (12, 9.5)) #reduce these values if you have a small screen
-            plt.subplot(2,2,1)
-            plt.imshow(Im3D)
-            plt.title('Classification results for ' + TestRiverTuple[f] + format(i,'05d') +'.jpg', fontweight='bold')
-            plt.xlabel('Input RGB Image', fontweight='bold')
-            plt.subplot(2,2,2)
-            cmapCHM = colors.ListedColormap(['black','lightblue','orange','green','yellow','red'])
-            plt.imshow(ClassIm, cmap=cmapCHM)
-            plt.xlabel('Validation Labels', fontweight='bold')
-            class0_box = mpatches.Patch(color='black', label='Unclassified')
-            class1_box = mpatches.Patch(color='lightblue', label='Water')
-            class2_box = mpatches.Patch(color='orange', label='Sediment')
-            class3_box = mpatches.Patch(color='green', label='Green Veg.')
-            class4_box = mpatches.Patch(color='yellow', label='Senesc. Veg.')
-            class5_box = mpatches.Patch(color='red', label='Paved Road')
-            ax=plt.gca()
-            ax.legend(handles=[class0_box, class1_box,class2_box,class3_box,class4_box,class5_box])
-            plt.subplot(2,2,3)
-            plt.imshow(PredictedClass, cmap=cmapCHM)
-            plt.xlabel('CNN tiles Classification. F1: ' + GetF1(reportCNN), fontweight='bold')
-            plt.subplot(2,2,4)
-            cmapCHM = colors.ListedColormap(['black', 'lightblue','orange','green','yellow','red'])
-            plt.imshow(PredictedImage, cmap=cmapCHM)
-            if MLP:
-                plt.xlabel('Self-Supervised Classification (MLP). F1: ' + GetF1(reportSSC), fontweight='bold' )
-            else:
-                plt.xlabel('Self-Supervised Classification (RF). F1: ' + GetF1(reportSSC), fontweight='bold' )
-            FigName = ScorePath + 'SSC_'+  Experiment + '_'+ TestRiverTuple[f] + format(i,'05d') +'.png'
-            plt.savefig(FigName, dpi=OutDPI)
-            if not DisplayHoldout:
-                plt.close()
-            
-
-
-
-
-
-            
             
 #Write out a classified images with a duplicated worldfile
 '''This section needs to be written. At the moment, there is no proper output aside from figures and the overall report as a csv'''

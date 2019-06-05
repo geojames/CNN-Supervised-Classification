@@ -24,12 +24,12 @@ import os.path
 """User data input. Fill in the info below before running"""
 #############################################################
 
-ScorePath = "Empty"
+ScorePath = "Empty" #output folder
 Experiment = 'Empty'
-model = 'Empty'
-Phase2Type = 'Empty' #indicate wether the phase 2 ML algorithm was RF or MLP
+model = 'Empty' #this will be a lable, not the exact model name
+Phase2Type = 'MLP' #indicate wether the phase 2 ML algorithm was RF or MLP (default)
 
-TestRiverName1 = "Empty"  #
+TestRiverName1 = "Empty"  #Enter the river names
 TestRiverName2 = "Empty"  # 
 TestRiverName3 = "Empty"  # 
 TestRiverName4 = "Empty"

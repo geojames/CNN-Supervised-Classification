@@ -1,6 +1,6 @@
 ### Self-Supervised Classification Sample Data
 
-The data in this folder is mainly intended to allow users verify that the code functions correctly on their system without the need to download more data from the larger data repository.
+The data in this folder is mainly intended to allow users to verify that the code functions correctly on their system without the need to download the large data volume from the repository.
 
 1) in the 'Train' Folder, there are samples of images/label pairs for training (with representative filenames)
     - Downloade this data and on line 83 of TrainCNN.py, enter the correct file path.

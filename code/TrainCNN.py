@@ -319,8 +319,8 @@ print(str(ImageTensor.shape[0]) + ' image tiles of ' + str(size) + ' X ' + str(s
 """Convnet section"""
 ##########################################################
 #Setup the convnet and add dense layers
-print('Loading ' + ModelName + '.h5') #be sure the pre-trained CNN is in the same folder as the training images
-FullModelPath = TrainPath + ModelName + '.h5'
+print('Loading ' + ModelInputName + '.h5') #be sure the pre-trained CNN is in the same folder as the training images
+FullModelPath = TrainPath + ModelInputName + '.h5'
 conv_base = load_model(FullModelPath)
 #conv_base = nasnet.NASNetLarge(weights='imagenet', input_shape = (size,size,3),include_top = False)
 
@@ -396,10 +396,10 @@ model.fit(ImageTensor, LabelTensor, batch_size=BatchSize, epochs=TrainingEpochs,
 
 
 """Save the model and class key"""
-FullModelPath = TrainPath + ModelName + '.h5'
+FullModelPath = TrainPath + ModelOutputName + '.h5'
 model.save(FullModelPath)
 
-ClassKeyName = TrainPath + ModelName + '.csv'
+ClassKeyName = TrainPath + ModelOutputName + '.csv'
 ClassKey.to_csv(path_or_buf = ClassKeyName, index = False)
 
 

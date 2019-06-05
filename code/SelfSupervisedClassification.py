@@ -77,9 +77,8 @@ import glob
 #############################################################
 
 ModelName = 'EMPTY'     #should be the model name from previous run of TrainCNN.py
-ModelPath = 'path'      #should be the training path from previous run of TrainCNN.py
 PredictPath = 'path'    #Location of the images
-ScorePath = 'path'      #location of the output files
+ScorePath = 'path'      #location of the output files and the model
 Experiment = 'EMPTY'    #ID to append to output performance files
 
 
@@ -115,8 +114,6 @@ OutDPI = 300 #Recommended 300 for inspection 1200 for papers, at 1200 this resul
 
 
 # Path checks- checks for folder ending slash, adds if nessesary
-if ('/' or "'\'") not in ModelPath[-1]:
-    ModelPath = ModelPath + '/'
 
 if ('/' or "'\'") not in PredictPath[-1]:
     PredictPath = PredictPath + '/'   
@@ -349,10 +346,10 @@ else:
 """Load the convnet model"""
 #print('Loading re-trained convnet model produced by a run of TrainCNN.py')
 print('Loading ' + ModelName + '.h5')
-FullModelPath = ModelPath + ModelName + '.h5'
+FullModelPath = ScorePath + ModelName + '.h5'
 ConvNetmodel = load_model(FullModelPath)
 
-ClassKeyPath = ModelPath + ModelName + '.csv'
+ClassKeyPath = ScorePath + ModelName + '.csv'
 ClassKey = pd.read_csv(ClassKeyPath)
 
 ###############################################################################

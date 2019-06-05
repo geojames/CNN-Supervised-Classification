@@ -5,7 +5,7 @@ The data in this folder is mainly intended to allow users verify that the code f
 1) in the 'Train' Folder, there are samples of images/label pairs for training (with representative filenames)
     - Downloade this data and on line 83 of TrainCNN.py, enter the correct file path.
     
-2) in the model folder `NASNetM_ImNet_50x.h5` is a pre-trained NASNet Mobile model with weights initialised with the ImageNet database.  The model is set to work with image tiles of 50X50 pixels.  Download this model to the same folder as the traiing images above and enter the name (without the .h5 extension) on line 86 of TrainCNN.py
+2) in the model folder `NASNetM_ImNet_50x.h5` is a pre-trained NASNet Mobile model with weights initialised with the ImageNet database.  The model is set to work with image tiles of 50X50 pixels.  Download this model to the same folder as the training images above and enter the name (without the .h5 extension) on line 86 of TrainCNN.py
 
 3) run TrainCNN.py.  Monitor your GPU usage and insure that TensorFlow-GPU is working correctly.
 

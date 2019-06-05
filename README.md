@@ -18,7 +18,7 @@ This code is currently in the development stage and intended for research purpos
 After installing dependencies, the code can be tested with the data and model provided in the sample_data folder.
 
 ### Model and data download
-Once the code functions, users must at least download the pre-trained models from the following repository.  The NASNet_Models.zip file contains NASNET Large and NASNet Mobile with weights from the Image Net database.  
+Once the code functions, users must at least download the pre-trained models from the following repository.  The NASNet_Models.zip file contains NASNET Large and NASNet Mobile with weights from the Image Net database. Users can also this data repository to access a database of over 1100 images used in the work cited below.
 
 ### Data preparation
 It is assumed that the data comes in the format that typically results from an airborne survey such as: root_number.jpg.   We recommend that the data be structured as: RiverName_Number.jpg.  The number must be at least 4 digits (RiverName_0022.jpg), but can be more if nessesare (exampe 5-digit, RiverName_12345.jpg).  The associated classification is expected to have the same filename but with a prefix of 'SCLS_' and a tif format (SCLS_RiverName_0022.tif). 

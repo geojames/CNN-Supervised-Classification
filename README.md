@@ -15,7 +15,7 @@ Supervised classification is a workflow in Remote Sensing (RS) whereby a human u
 This code is currently in the development stage and intended for research purposes.  The coding structure is naive and not optimised for production.  The process is not yet designed to output class rasters for new unclassified images and expects every image to have an accompanying class raster for either training or for validation. 
 
 ### Installation and debugging
-After installing dependencies, the code can be tested with the data and model provided in the sample_data folder.
+After installing dependencies, the code can be tested with the instructions, data and model provided in the sample_data folder.
 
 ### Model and data download
 Once the code functions, users must at least download the pre-trained models from the following repository.  The NASNet_Models.zip file contains NASNET Large and NASNet Mobile with weights from the Image Net database. Users can also this data repository to access a database of over 1100 images used in the work cited below.

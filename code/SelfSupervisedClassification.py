@@ -76,9 +76,9 @@ import glob
 """User data input. Fill in the info below before running"""
 #############################################################
 
-ModelPath = 'path'      #should be the training path from previous run of TrainCNN_
+ModelName = 'EMPTY'     #should be the model name from previous run of TrainCNN.py
+ModelPath = 'path'      #should be the training path from previous run of TrainCNN.py
 PredictPath = 'path'    #Location of the images
-ModelName = 'EMPTY'     #The retrained convnet to use, do not specify extension. Must be located in ModelPath
 ScorePath = 'path'      #location of the output files
 Experiment = 'EMPTY'    #ID to append to output performance files
 

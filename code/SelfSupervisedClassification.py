@@ -99,7 +99,7 @@ MLP = True
 ModelChoice = 2 # 2 for deep model and 3 for very deep model 
 LearningRate = 0.001
 #If MLP is True, enter the right number of epochs. 
-TrainingEpochs = 70
+TrainingEpochs = 30
 
 
 Chatty = 1 # set the verbosity of the model training.  Use 1 at first, 0 when confident that model is well tuned

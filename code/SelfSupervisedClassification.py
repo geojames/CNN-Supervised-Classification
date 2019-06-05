@@ -347,7 +347,7 @@ else:
 
 ###############################################################################
 """Load the convnet model"""
-#print('Loading re-trained convnet model produced by a run ThirdTimeLucky_(CNN model name).py')
+#print('Loading re-trained convnet model produced by a run of TrainCNN.py')
 print('Loading ' + ModelName + '.h5')
 FullModelPath = ModelPath + ModelName + '.h5'
 ConvNetmodel = load_model(FullModelPath)

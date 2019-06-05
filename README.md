@@ -14,7 +14,7 @@ Supervised classification is a workflow in Remote Sensing (RS) whereby a human u
 ### Disclaimer
 This code is currently in the development stage and intended for research purposes.  The coding structure is naive and not optimised for production.  The process is not yet designed to output class rasters for new unclassified images and expects every image to have an accompanying class raster for either training or for validation. 
 
-### Installation and debugging
+### Installation
 After installing dependencies, the code can be tested with the instructions, data and model provided in the sample_data folder.
 
 ### Model and data download

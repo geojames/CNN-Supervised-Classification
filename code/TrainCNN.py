@@ -82,8 +82,9 @@ import fnmatch
 
 TrainPath = 'path'  #Watch the \\ and if there is a bug go to single quotes.  This folder shold have the training images, labels and the pre-trained NASNet model.
 
-#Output name for the model.  It wil be saved in the training folder
-ModelName = 'EMPTY'      #no extensions
+#Input and Output name for the model.  It wil be saved in the training folder
+ModelInputName = 'EMPTY' #no extensions
+ModelOutputName = 'EMPTY'      
 ScorePath = 'path'          #where the model will be saved
 
 size = 50 # Size of the tiles.  This should not change.

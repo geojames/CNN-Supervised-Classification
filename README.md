@@ -26,11 +26,11 @@ It is assumed that the data comes in the format that typically results from an a
 ### CNN Training
 Once image data is organised, the script TrainCNN_NASNetLarge.py can be used to train the NASNet Large architecture.  An equivalent script for NASNet_Mobile is also available.  User options are at the start.  Elements marked 'Path' or 'Empty' need to be edited. Multiple rivers can be included in the same folder, they will be separated based on the River Names included in the image file names (see above).  On first running, it is recommended to set the ModelTuning variable to True and run the tuning procedure for the CNN.  This will output a figure and the correct number of tuning epochs can be set as the point where the loss and accuracy of the validation data begin to diverge from the loss and accuracy of the training data.  Once this is established, the script must be run again with ModelTuning set to False and the correct value for Tuning. This will save the model with a .h5 extension and it will also save a class key as a small csv file. Once these options are edited in the code no switches are required. e.g. :
 ```
-TrainCNN_NASNetLarge
+TrainCNN
 ```
 will work from an Ipython console and:
 ```
-python C:\MyCode\TrainCNN_NASNetLarge.py
+python C:\MyCode\TrainCNN.py
 ```
 will execute the script from a prompt provided the code path is correct.  The easiest option is to use Spyder to edit, save and execute the directly from the editor (Hotkey: F5). Note that in this case you must be sure that dependencies are correctly installed for use by Spyder.  You may need to re-install another version of Spyder in the TensorFlow environment.
 

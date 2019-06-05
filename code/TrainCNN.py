@@ -102,7 +102,7 @@ TuningSubSamp = 0.15 # Subsample of data, 0-1, to be used in tuning.
 
 #If the model is tuned, enter the right number of epochs.
 #This is only used when ModelTuning is False.  
-TrainingEpochs = 10
+TrainingEpochs = 5
 
 # create Score Directory if not present
 if os.path.exists(ScorePath) == False:

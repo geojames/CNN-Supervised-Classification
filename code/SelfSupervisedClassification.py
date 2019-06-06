@@ -76,10 +76,11 @@ import glob
 """User data input. Fill in the info below before running"""
 #############################################################
 
-ModelName = 'EMPTY'     #should be the model name from previous run of TrainCNN.py
-PredictPath = 'path'    #Location of the images
-ScorePath = 'path'      #location of the output files and the model
-Experiment = 'EMPTY'    #ID to append to output performance files
+ModelName = ''     #should be the model name from previous run of TrainCNN.py
+TrainPath = '' #location of the trained model
+PredictPath = ''    #Location of the images
+ScorePath = ''      #location of the output files and the model
+Experiment = ''    #ID to append to output performance files
 
 
 UseSmote = False #Turn SMOTE-ENN resampling on and off
@@ -98,11 +99,11 @@ MLP = True
 ModelChoice = 2 # 2 for deep model and 3 for very deep model 
 LearningRate = 0.001
 #If MLP is True, enter the right number of epochs. 
-TrainingEpochs = 30
+TrainingEpochs = 20
 
 
 Chatty = 1 # set the verbosity of the model training.  Use 1 at first, 0 when confident that model is well tuned
-SubSample = 0.1 #0-1 percentage of the image pixels to use in fitting the self-supervised models
+SubSample = 0.6 #0-1 percentage of the image pixels to use in fitting the self-supervised models
 MinSample = 250000 #minimum sample size
 SmallestElement = 10 # Despeckle the classification to the smallest length in pixels of element remaining, just enter linear units (e.g. 3 for 3X3 pixels)
 
@@ -346,10 +347,10 @@ else:
 """Load the convnet model"""
 #print('Loading re-trained convnet model produced by a run of TrainCNN.py')
 print('Loading ' + ModelName + '.h5')
-FullModelPath = ScorePath + ModelName + '.h5'
+FullModelPath = TrainPath + ModelName + '.h5'
 ConvNetmodel = load_model(FullModelPath)
 
-ClassKeyPath = ScorePath + ModelName + '.csv'
+ClassKeyPath = TrainPath + ModelName + '.csv'
 ClassKey = pd.read_csv(ClassKeyPath)
 
 ###############################################################################

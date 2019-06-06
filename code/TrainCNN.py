@@ -79,13 +79,13 @@ import fnmatch
 #------------------------------------------------------------
 """User data input. Fill in the info below before running"""
 #------------------------------------------------------------
-
-TrainPath = 'path'  #Watch the \\ and if there is a bug go to single quotes.  This folder shold have the training images, labels and the pre-trained NASNet model.
-
+#Watch the \\ and if there is a bug go to single quotes.  This folder shold have the training images, labels and the pre-trained NASNet model.
+#Trained model and class key will also be written out to the training folder
+TrainPath = 'C:\\Users\\Patrice\\Documents\\GitHub\\Self-Supervised-Classification\\sample_data\Train\\'  
 #Input and Output name for the model.  It wil be saved in the training folder
-ModelInputName = 'EMPTY' #no extensions
-ModelOutputName = 'EMPTY'      
-ScorePath = 'path'          #where the model will be saved
+ModelInputName = 'NASNetM_ImNet_50x' #no extensions
+ModelOutputName = 'GitTest'      
+         #where the model will be saved
 
 size = 50 # Size of the tiles.  This should not change.
 NClasses = 5 

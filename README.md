@@ -48,6 +48,8 @@ will execute the script from a prompt provided the code path is correct.  The ea
 ![GitHub_StMarg27170](https://user-images.githubusercontent.com/47110600/56954378-8bd66380-6b36-11e9-8396-8ba150c4c4aa.png)
 *Figure 1. Sample 4-part output*
 
+IMPORTANT: The SelfSupervised classification script will use the specified CNN to classify all the images in the PredictPath folder.  Users needing to apply a specific CNN to a specific river dataset should save the imagery from seperate rivers in seperate folders.
+
 ### Report Compilation
 The SSC execution will result 3 files per classified image: separate classification score files for for the CNN and MLP (or RF) stages and an image file showing the input image, the validation data, the CNN classification (used sas training data for the next step) and the MLP (or RF) classification. CompileClassificationReports.py can be edited and executed in a similar way and will output a single csv file whose format is intended for use with Pandas and Seaborn for visualisation.  
 

@@ -76,11 +76,11 @@ import glob
 """User data input. Fill in the info below before running"""
 #############################################################
 
-ModelName = ''     #should be the model name from previous run of TrainCNN.py
-TrainPath = '' #location of the trained model
-PredictPath = ''    #Location of the images
-ScorePath = ''      #location of the output files and the model
-Experiment = ''    #ID to append to output performance files
+ModelName = 'Empty'     #should be the model name from previous run of TrainCNN.py
+TrainPath = 'Empty' #location of the trained model
+PredictPath = 'Empty'    #Location of the images
+ScorePath = 'Empty'      #location of the output files and the model
+Experiment = 'Empty'    #ID to append to output performance files
 
 '''BASIC PARAMETER CHOICES'''
 UseSmote = False #Turn SMOTE-ENN resampling on and off

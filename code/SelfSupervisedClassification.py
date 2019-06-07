@@ -11,8 +11,8 @@ __status__ = "initial release"
 __url__ = "https://github.com/geojames/Self-Supervised-Classification"
 
 """
-Name:           TrainCNN_NasNetMobile.py
-Compatibility:  Python 3.7
+Name:           SelfSupervisedClassification.py
+Compatibility:  Python 3.6
 Description:    Performs Self-Supervised Image CLassification with a 
                 pre-trained Convolutional Neural Network model.
                 User options are in the first section of code.

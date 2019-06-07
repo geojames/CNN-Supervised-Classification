@@ -63,7 +63,6 @@ from skimage.filters.rank import median, entropy, modal
 import os.path
 from sklearn import metrics
 from skimage.morphology import disk
-from imblearn.over_sampling import SMOTE
 from imblearn.combine import SMOTEENN
 import copy
 import sys
@@ -77,7 +76,7 @@ import glob
 #############################################################
 
 ModelName = 'Empty'     #should be the model name from previous run of TrainCNN.py
-TrainPath = 'Empty' #location of the trained model
+TrainPath = 'Empty'  
 PredictPath = 'Empty'    #Location of the images
 ScorePath = 'Empty'      #location of the output files and the model
 Experiment = 'Empty'    #ID to append to output performance files
@@ -85,7 +84,7 @@ Experiment = 'Empty'    #ID to append to output performance files
 '''BASIC PARAMETER CHOICES'''
 UseSmote = False #Turn SMOTE-ENN resampling on and off
 MLP = True #If false, the phase 2 class will be done with a random forest
-TrainingEpochs = 70 #Typically this can be reduced
+TrainingEpochs = 35 #Typically this can be reduced
 Ndims = 4 # Feature Dimensions. 4 if using entropy in phase 2, 3 if just RGB
 SubSample = 0.6 #0-1 percentage of the CNN output to use in the MLP.
 NClasses = 5  #The number of classes in the data. This MUST be the same as the classes used to retrain the model
@@ -98,7 +97,7 @@ RecogThresh = 0 #minimum prob of the top-1 predictions to keep
 SmallestElement = 0 # Despeckle the classification to the smallest length in pixels of element remaining, just enter linear units (e.g. 3 for 3X3 pixels)
 
 
-'''MODEL PARAMETERS''' #These would usually not be eidted
+'''MODEL PARAMETERS''' #These would usually not be edited
 DropRate = 0.5
 ModelChoice = 2 # 2 for deep model and 3 for very deep model 
 LearningRate = 0.001

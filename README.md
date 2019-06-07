@@ -18,7 +18,7 @@ This code is currently in the development stage and intended for research purpos
 After installing dependencies, the code can be tested with the instructions, data and model provided in the sample_data folder.
 
 ### Model and data download
-Once the code functions, users must at least download the pre-trained models from the following repository.  The NASNet_Models.zip file contains a base model for NASNet Large which can be trained with the imagery and labels provided in the data repository or to new data.  The NASNet_Models.zip also contains a set of pre-trained NASNet Mobile models which can be used to run 'SelfSupervisedClassification.py' with the 1100+ images provided in the repository and used in the work cited below.  Due to file sizes, pr-etrained NASNet Large models for all rivers are not provided.  
+Once the code functions, users can use the base NASNet Mobile provided for testing and/or download the pre-trained models from the following repository.  The NASNet_Models.zip file contains a base model for NASNet Large which can be trained with the imagery and labels provided in the data repository or to new data.  The NASNet_Models.zip also contains a set of pre-trained NASNet Mobile models which can be used to run 'SelfSupervisedClassification.py' with the 1100+ images provided in the repository and used in the work cited below.  Due to file sizes, pre-trained NASNet Large models for all rivers are not provided.  
 
 ### Data preparation
 It is assumed that the data comes in the format that typically results from an airborne survey such as: root_number.jpg.   We recommend that the data be structured as: RiverName_Number.jpg.  The number must be at least 4 digits (RiverName_0022.jpg), but can be more if nessesary (exampe 5-digit, RiverName_12345.jpg).  The associated classification is expected to have the same filename but with a prefix of 'SCLS_' and a tif format (SCLS_RiverName_0022.tif). The default number of land-cover classes in the code and in the label data is 5, but users can alter this as needed.  However, all the code and models function by tiling the input imagery in sub-images of 50x50 pixels. 
@@ -47,6 +47,8 @@ will execute the script from a prompt provided the code path is correct.  The ea
 
 ![GitHub_StMarg27170](https://user-images.githubusercontent.com/47110600/56954378-8bd66380-6b36-11e9-8396-8ba150c4c4aa.png)
 *Figure 1. Sample 4-part output*
+
+IMPORTANT: The Self-Supervised Classification script will use the specified CNN to classify all the images in the PredictPath folder.  Users needing to apply a specific CNN to a specific river dataset should save the imagery from separate rivers in separate folders.
 
 ### Report Compilation
 The SSC execution will result 3 files per classified image: separate classification score files for for the CNN and MLP (or RF) stages and an image file showing the input image, the validation data, the CNN classification (used sas training data for the next step) and the MLP (or RF) classification. CompileClassificationReports.py can be edited and executed in a similar way and will output a single csv file whose format is intended for use with Pandas and Seaborn for visualisation.  

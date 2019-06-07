@@ -81,17 +81,15 @@ import fnmatch
 #------------------------------------------------------------
 #Watch the \\ and if there is a bug go to single quotes.  This folder shold have the training images, labels and the pre-trained NASNet model.
 #Trained model and class key will also be written out to the training folder
-TrainPath = 'C:\\Users\\Patrice\\Documents\\GitHub\\Self-Supervised-Classification\\sample_data\Train\\'  
+TrainPath = ''  
 #Input and Output name for the model.  It wil be saved in the training folder
-ModelInputName = 'NASNetM_ImNet_50x' #no extensions
-ModelOutputName = 'GitTest'      
+ModelInputName = 'NASNetMobile_base_50px' #no extensions
+ModelOutputName = ''      
          #where the model will be saved
 
-size = 50 # Size of the tiles.  This should not change.
-NClasses = 5 
+NClasses = 5 #The number of classes in the imagery. Adjust as needed
 
-BiggestImage = 99999 #Enter the number, can be approximate but bigger, of the last image
-BatchSize = 100 #will depend on your GPU
+
 
 #use this option to train the model with a validation subset. Accuracy and loss checks will be displayed.
 #When the tuning is satisfactory, set to False and train with the whole dataset. Model will only be saved if this is set to False
@@ -103,17 +101,13 @@ TuningSubSamp = 0.15 # Subsample of data, 0-1, to be used in tuning.
 #If the model is tuned, enter the right number of epochs.
 #This is only used when ModelTuning is False.  
 TrainingEpochs = 5
-
-# create Score Directory if not present
-if os.path.exists(ScorePath) == False:
-    os.mkdir(ScorePath)
+BatchSize = 100 #will depend on your GPU
 
 # Path checks- checks for folder ending slash, adds if nessesary
 if ('/' or "'\'") not in TrainPath[-1]:
     TrainPath = TrainPath + '/'
 
-if ('/' or "'\'") not in ScorePath[-1]:
-    ScorePath = ScorePath +'/'
+
 
 ##################################################################
 """ HELPER FUNCTIONS SECTION"""
@@ -253,6 +247,7 @@ def checkInputImgNames(path):
 ###############################################################################
 """Data Preparation Section"""
 ###############################################################################    
+size = 50 #Do not edit. The base models supplied all assume a tile size of 50.  
 
 # Check Files Name Pattern
 checkInputImgNames(TrainPath)
@@ -322,7 +317,7 @@ print(str(ImageTensor.shape[0]) + ' image tiles of ' + str(size) + ' X ' + str(s
 print('Loading ' + ModelInputName + '.h5') #be sure the pre-trained CNN is in the same folder as the training images
 FullModelPath = TrainPath + ModelInputName + '.h5'
 conv_base = load_model(FullModelPath)
-#conv_base = nasnet.NASNetLarge(weights='imagenet', input_shape = (size,size,3),include_top = False)
+
 
 model = models.Sequential()
 model.add(conv_base)
@@ -386,8 +381,7 @@ if ModelTuning:
     plt.ylabel('Accuracy')
     plt.legend()
     plt.show()
-    FigName = ScorePath + 'PaperFigure4' +'.png'
-    plt.savefig(FigName, dpi=900)
+
     
     sys.exit("Tuning Finished, adjust parameters and re-train the model") # stop the code if still in tuning phase.
 

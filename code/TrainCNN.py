@@ -100,7 +100,7 @@ TuningSubSamp = 0.15 # Subsample of data, 0-1, to be used in tuning.
 
 #If the model is tuned, enter the right number of epochs.
 #This is only used when ModelTuning is False.  
-TrainingEpochs = 5
+TrainingEpochs = 10
 BatchSize = 100 #will depend on your GPU
 
 # Path checks- checks for folder ending slash, adds if nessesary

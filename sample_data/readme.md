@@ -9,7 +9,7 @@ The data in this folder is mainly intended to allow users to verify that the cod
 
 3) run TrainCNN.py.  Monitor your GPU usage and insure that TensorFlow-GPU is working correctly.
 
-4) in the 'Validate' folder, there are sample images that can be used for a mock validation of the trained model. Download these to a new folder and edit lines 79 to 83 of `SelfSupervisedClassification.py`.  The other parametes can be left as dafault in the first instance.  
+4) in the 'Validate' folder, there are sample images that can be used for a mock validation of the trained model. Download these to a new folder and edit lines 79 to 83 of `SelfSupervisedClassification.py`.  Line 79 should have the model name selected in TrainCNN.py.  Line 80 should point to the same file path as line 84 in TrainCNN.py.  The other parametes can be left as dafault in the first instance.  
 
 5) At the end, the folder designated as the ScorePath on line 82 of `SelfSupervisedClassification.py`  should have 10 4-part figures in png format and 20 small csv files.  Use CompileClassiticationReport to merge the csv files into a single database formatted for use with the Seaborn visualisation library.
 

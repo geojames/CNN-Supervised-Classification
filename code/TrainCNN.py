@@ -11,12 +11,12 @@ __status__ = "initial release"
 __url__ = "https://github.com/geojames/Self-Supervised-Classification"
 
 """
-Name:           TrainCNN_NasNetLarge.py
+Name:           TrainCNN.py
 Compatibility:  Python 3.6
 Description:    This file trains and outputs a NASNet Large model to for the 
                 task of river classification from RGB images
 
-Requires:       keras, numpy, pandas, matplotlib, skimage, sklearn
+Requires:       keras, TensorFlow-GPU, numpy, pandas, matplotlib, skimage, sklearn
 
 Dev Revisions:  JTD - 19/4/19 - Updated file paths, added auto detection of
                     river names from input images, improved image reading loops

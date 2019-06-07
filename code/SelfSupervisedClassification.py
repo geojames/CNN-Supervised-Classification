@@ -82,36 +82,32 @@ PredictPath = ''    #Location of the images
 ScorePath = ''      #location of the output files and the model
 Experiment = ''    #ID to append to output performance files
 
-
+'''BASIC PARAMETER CHOICES'''
 UseSmote = False #Turn SMOTE-ENN resampling on and off
-size = 50 # Size of the tiles.  This MUST be the same as the tile size used to retrain the model
-MinTiles = 0 #The minimum number of contiguous tiles of size 'size' to consider as a significnat element in the image.  
+MLP = True #If false, the phase 2 class will be done with a random forest
+TrainingEpochs = 70 #Typically this can be reduced
+Ndims = 4 # Feature Dimensions. 4 if using entropy in phase 2, 3 if just RGB
+SubSample = 0.6 #0-1 percentage of the CNN output to use in the MLP.
 NClasses = 5  #The number of classes in the data. This MUST be the same as the classes used to retrain the model
-RecogThresh = 0 #minimum prob of the top-1 predictions to keep
-FirstImage = 0
-BiggestImage = 9999 #Enter the number, can be approximate but bigger, of the last image
-Ndims = 4 # Feature Dimensions. 4 if using entropy in the self-supervised classification, 3 if just RGB
-DropRate = 0.5
+DisplayHoldout =  False #Display the results figure which is saved to disk.  
+OutDPI = 150 #Recommended 150 for inspection 1200 for papers.  
 
-#Set MLP below to True to use the output of the CNN as training data in an MLP, defined below. False will use a random forest.
-MLP = True 
-#Choose MLP model
+'''FILTERING OPTIONS'''
+MinTiles = 0 #The minimum number of contiguous tiles to consider as a significnat element in the image.  
+RecogThresh = 0 #minimum prob of the top-1 predictions to keep
+SmallestElement = 0 # Despeckle the classification to the smallest length in pixels of element remaining, just enter linear units (e.g. 3 for 3X3 pixels)
+
+
+'''MODEL PARAMETERS''' #These would usually not be eidted
+DropRate = 0.5
 ModelChoice = 2 # 2 for deep model and 3 for very deep model 
 LearningRate = 0.001
-#If MLP is True, enter the right number of epochs. 
-TrainingEpochs = 20
-
-
 Chatty = 1 # set the verbosity of the model training.  Use 1 at first, 0 when confident that model is well tuned
-SubSample = 0.6 #0-1 percentage of the image pixels to use in fitting the self-supervised models
-MinSample = 250000 #minimum sample size
-SmallestElement = 10 # Despeckle the classification to the smallest length in pixels of element remaining, just enter linear units (e.g. 3 for 3X3 pixels)
+MinSample = 250000 #minimum sample size per class before warning
 
-#if true this will plot a results figure for each holdout image.  Set to false if you have more than ca. 15-20 holdout images
-# if false it will just plot the last one.
-#in both cases, a png version will be saved to disk
-DisplayHoldout =  False
-OutDPI = 300 #Recommended 300 for inspection 1200 for papers, at 1200 this results in 15Mb per output figure.  
+
+
+
 
 
 # Path checks- checks for folder ending slash, adds if nessesary
@@ -355,6 +351,7 @@ ClassKey = pd.read_csv(ClassKeyPath)
 
 ###############################################################################
 """Classify the holdout images with Self-Supervised Classification"""
+size = 50 #Do not edit. The base models supplied all assume a tile size of 50.
 
 # Getting River Names from the files
 # Glob list fo all jpg images, get unique names form the total list

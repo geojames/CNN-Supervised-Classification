@@ -84,7 +84,7 @@ import fnmatch
 TrainPath = ''  
 #Input and Output name for the model.  It wil be saved in the training folder
 ModelInputName = 'NASNetMobile_base_50px' #no extensions
-ModelOutputName = ''      
+ModelOutputName = 'Empty'      
          #where the model will be saved
 
 NClasses = 5 #The number of classes in the imagery. Adjust as needed

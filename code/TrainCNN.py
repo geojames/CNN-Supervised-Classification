@@ -81,7 +81,7 @@ import fnmatch
 #------------------------------------------------------------
 #Watch the \\ and if there is a bug go to single quotes.  This folder shold have the training images, labels and the pre-trained NASNet model.
 #Trained model and class key will also be written out to the training folder
-TrainPath = ''  
+TrainPath = 'Empty'  
 #Input and Output name for the model.  It wil be saved in the training folder
 ModelInputName = 'NASNetMobile_base_50px' #no extensions
 ModelOutputName = 'Empty'      

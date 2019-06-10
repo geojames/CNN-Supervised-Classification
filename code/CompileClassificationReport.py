@@ -1,14 +1,43 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#------------------------------------------------------------------------------
+__author__ = 'Patrice Carbonneau'
+__contact__ = 'patrice.carbonneau@durham.ac.uk'
+__copyright__ = '(c) Patrice Carbonneau'
+__license__ = 'MIT'
+__date__ = '15 APR 2019'
+__version__ = '1.1'
+__status__ = "initial release"
+__url__ = "https://github.com/geojames/Self-Supervised-Classification"
+
 """
-Created on Sat Jul 21 09:33:42 2018
+Name:           CompileClassificationReport.py
+Compatibility:  Python 3.6
+Description:    this utility runs through the individual outputs of 
+                SelfSupervisedClassification and compiles the results into a
+                single spreadsheet with a column structure that works well with
+                Pandas row selection and Seaborn switches for hues and other
+                visualisation options
+Requires:       numpy, pandas, glob
 
-@author: dgg0pc
-
-Compile classification reports
-this utility runs through the individual outputs of SelfSupervisedClassification and 
-compiles the results into a single spreadsheet with a column structure that 
-works well with Pandas row selection and Seaborn switches 
-for hues and other visualisation options
+Dev Revisions:  JTD - 19/6/10 - Updated and optimied for Pandas
+                    
+Licence:        MIT
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to do 
+so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all 
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+SOFTWARE.
 """
 
 ###############################################################################
@@ -16,228 +45,109 @@ for hues and other visualisation options
 
 import numpy as np
 import pandas as pd
+import glob
 import os.path
-
 
 
 #############################################################
 """User data input. Fill in the info below before running"""
 #############################################################
 
-ScorePath = "Empty" #output folder
+ScorePath = "Empty"     #output folder
 Experiment = 'Empty'
-model = 'Empty' #this will be a lable, not the exact model name
-Phase2Type = 'MLP' #indicate wether the phase 2 ML algorithm was RF or MLP (default)
+model = 'Empty'         #this will be a label, not the exact model name
+Phase2Type = 'MLP'      #indicate wether the phase 2 ML algorithm was MLP (default) or RF
 
-TestRiverName1 = "Empty"  #Enter the river names
-TestRiverName2 = "Empty"  # 
-TestRiverName3 = "Empty"  # 
-TestRiverName4 = "Empty"
-TestRiverName5 = "Empty"
-TestRiverName6 = 'Empty'
-TestRiverName7 = "Empty"
-TestRiverName8 = "Empty"
-TestRiverName9 = "Empty"
-TestRiverName10 = "Empty"
-TestRiverName11 = "Empty"
-TestRiverName12 = "Empty"
+# Path checks- checks for folder ending slash, adds if nessesary
 
-
-
-
-##################################################################
-""" HELPER FUNCTIONS SECTION"""
-##################################################################
-
-##################################################################
-#Save classification reports to csv with Pandas
-def classification_report_csv(report, filename):
-    report_data = []
-    lines = report.split('\n')
-    for line in lines[2:-3]:
-        row = {}
-        row_data = line.split(' ') 
-        row_data = list(filter(None, row_data))
-        row['class'] = row_data[0]
-        row['precision'] = float(row_data[1])
-        row['recall'] = float(row_data[2])
-        row['f1_score'] = float(row_data[3])
-        row['support'] = float(row_data[4])
-        report_data.append(row)
-    dataframe = pd.DataFrame.from_dict(report_data)
-    dataframe.to_csv(filename, index = False) 
-    
-
-
-
-
-
-
-##############################################################################
-
+if ('/' or "'\'") not in ScorePath[-1]:
+    ScorePath = ScorePath +'/'
 
 ###############################################################################
 """Compile a single classification report from all the individual image reports"""
 
-TestRiverTuple = (TestRiverName1, TestRiverName2, TestRiverName3, TestRiverName4, TestRiverName5,
-                  TestRiverName6, TestRiverName7, TestRiverName8, TestRiverName9, TestRiverName10,
-                  TestRiverName11, TestRiverName12)
+# Getting River Names from the input files
+# Glob list fo all jpg images, get unique names form the total list
+cnn_csv = glob.glob(ScorePath+"CNN_*.csv")
+TestRiverTuple = []
+for c in cnn_csv:
+    TestRiverTuple.append(os.path.basename(c).split('_')[1])
+TestRiverTuple = np.unique(TestRiverTuple)
 
-#shave the empty slots off of RiverTuple
-for r in range(11,0, -1):
-    if 'Empty' in TestRiverTuple[r]:
-        TestRiverTuple = TestRiverTuple[0:r]
+# Get the CNN (phase 1) reports compiled
 
-
-
-#Get the CNN (phase 1) reports compiled.
-TypeName = 'CNN_' 
-MasterDict = {'F1':[0], 'Support':[0], 'RiverName':'Blank', 'Type':'CNN', 'Sample':'Blank', 'Class':'Blank'}
-MasterDF = pd.DataFrame(MasterDict)
-for f in range(0,len(TestRiverTuple)):
-
-    print('Compiling CNN reports for ' + TestRiverTuple[f])
-    for i in range(0,32000): #32000 will cover the large numbers in the StMarg set
-        #if 'Kinogawa' in TestRiverTuple[f]:
-         #   ReportPath = ScorePath + TypeName + TestRiverTuple[f] + format(i,'05d') + '_'  + 'Kinogawa'+'_5River'+'.csv'
-        #else:
-        ReportPath = ScorePath + TypeName + TestRiverTuple[f] + format(i,'05d') + '_'+ Experiment +'.csv'
-        
-        if os.path.exists(ReportPath):
-            DF = pd.read_csv(ReportPath)
-            FileValues = np.zeros((2))
-            F1values = np.zeros((6,2))
-            for c in range(1,6):
-                if c in DF['class'].values:
-                    FileValues[0] = 100*np.asarray(DF.loc[DF['class'] == c, 'f1_score'])
-                    FileValues[1] = np.asarray(DF.loc[DF['class'] == c, 'support'])
-                    F1values[c,0] = FileValues[0]
-                    F1values[c,1] = FileValues[1]
-                    if (c==1 and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'CNN', 'Sample':'InSample', 'Class':'Water', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF], sort = False)						
-                    elif (c==2  and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'CNN', 'Sample':'InSample', 'Class':'Sediment', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF])
-                    elif (c==3 and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'CNN', 'Sample':'InSample', 'Class':'Green Veg.', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF], sort = False)
-                    elif (c==4 and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'CNN', 'Sample':'InSample', 'Class':'Senesc. Veg.', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF], sort = False)
-                    elif (c==5 and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'CNN', 'Sample':'InSample', 'Class':'Paved Road', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF], sort = False)
-                    elif (c==1 and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'CNN', 'Sample':'OutOfSample', 'Class':'Water', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF], sort = False)
-                    elif (c==2  and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'CNN', 'Sample':'OutOfSample', 'Class':'Sediment', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF], sort = False)
-                    elif (c==3 and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'CNN', 'Sample':'OutOfSample', 'Class':'Green Veg.', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF], sort = False)
-                    elif (c==4 and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'CNN', 'Sample':'OutOfSample', 'Class':'Senesc. Veg.', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF], sort = False)
-                    elif (c==5 and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':'CNN', 'Sample':'OutOfSample', 'Class':'Paved Road', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF], sort = False)
-            if f>5:
-                WF1 = np.sum((F1values[:,0]*F1values[:,1]))/np.sum(F1values[:,1])
-                FileDict = {'F1':[WF1], 'Support':[np.sum(F1values[:,1])], 'RiverName':TestRiverTuple[f], 'Type':'CNN', 'Sample':'OutOfSample', 'Class':'ALL', 'Experiment':Experiment, 'model':model}
-                FileDF = pd.DataFrame(FileDict)
-                MasterDF = pd.concat([MasterDF, FileDF])
-            else:
-                WF1 = np.sum((F1values[:,0]*F1values[:,1]))/np.sum(F1values[:,1])
-                FileDict = {'F1':[WF1], 'Support':[np.sum(F1values[:,1])], 'RiverName':TestRiverTuple[f], 'Type':'CNN', 'Sample':'InSample', 'Class':'ALL', 'Experiment':Experiment, 'model':model}
-                FileDF = pd.DataFrame(FileDict)
-                MasterDF = pd.concat([MasterDF, FileDF])
-
+#establish a DF for the CNN results
+CNN_df = pd.DataFrame(np.zeros([1,8]),columns = ['class','f1_score','support','RiverName','Image','type','experiment','model'])
                     
-            
-#Get the MLP (phase 2)Empty Classification reports compiled. 
- 
-
-
-TypeName = Phase2Type + '_' 
-for f in range(0,len(TestRiverTuple)):
-
-    print('Compiling phase 2 reports for ' + TestRiverTuple[f])
-    for i in range(0,32000): #32000 will cover the large numbers in the StMarg set
-
-        ReportPath = ScorePath + TypeName + TestRiverTuple[f] + format(i,'05d') + '_'+ Experiment +'.csv'
+# for each river, get all the csv files that match river name
+#   for each csv file, extract: class, f1 and support scores to new DF
+#       Clean and concat the CNN csv files as we go
+#   Renames classes and add type, exp, model column info
+for f,riv in enumerate(TestRiverTuple):
+    print('Compiling CNN reports for ' + riv)
+    cnn_csv = glob.glob(ScorePath+"CNN_" + riv + "*.csv")
+    
+    for i,csv in enumerate(cnn_csv):
+        DF = pd.read_csv(csv)                       
+        FileDf = DF.filter(['class','f1_score','support'],axis=1)
+        FileDf = FileDf.drop(FileDf[(FileDf.f1_score == 0) & (FileDf.support == 0)].index)
+        FileDf = FileDf.append(pd.DataFrame([['ALL',np.sum((FileDf.f1_score*FileDf.support))/np.sum(FileDf.support),np.sum(FileDf.support)]],columns=['class','f1_score','support']))
+        FileDf['RiverName'] = riv
+        FileDf['Image'] = os.path.basename(csv).split('_')[1] + "_" + os.path.basename(csv).split('_')[2]
+        CNN_df = pd.concat([CNN_df, FileDf], sort = False)
         
-        if os.path.exists(ReportPath):
-            DF = pd.read_csv(ReportPath)
-            FileValues = np.zeros((2))
-            F1values = np.zeros((6,2))
-            for c in range(1,6):
-                if c in DF['class'].values:
-                    FileValues[0] = 100*np.asarray(DF.loc[DF['class'] == c, 'f1_score'])
-                    FileValues[1] = np.asarray(DF.loc[DF['class'] == c, 'support'])
-                    F1values[c,0] = FileValues[0]
-                    F1values[c,1] = FileValues[1]
-                    if (c==1 and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'InSample', 'Class':'Water', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF])						
-                    elif (c==2  and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'InSample', 'Class':'Sediment', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF])
-                    elif (c==3 and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'InSample', 'Class':'Green Veg.', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF])
-                    elif (c==4 and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'InSample', 'Class':'Senesc. Veg.', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF])
-                    elif (c==5 and f<6 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'InSample', 'Class':'Paved Road', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF])
-                    elif (c==1 and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'OutOfSample', 'Class':'Water', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF])
-                    elif (c==2  and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'OutOfSample', 'Class':'Sediment', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF])
-                    elif (c==3 and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'OutOfSample', 'Class':'Green Veg.', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF])
-                    elif (c==4 and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'OutOfSample', 'Class':'Senesc. Veg.', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF])
-                    elif (c==5 and f>5 and FileValues[1] > 0):
-                        FileDict = {'F1':[FileValues[0]], 'Support':[FileValues[1]], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'OutOfSample', 'Class':'Paved Road', 'Experiment':Experiment, 'model':model}
-                        FileDF = pd.DataFrame(FileDict)
-                        MasterDF = pd.concat([MasterDF, FileDF])
-            if f>5:
-                WF1 = np.sum((F1values[:,0]*F1values[:,1]))/np.sum(F1values[:,1])
-                FileDict = {'F1':[WF1], 'Support':[np.sum(F1values[:,1])], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'OutOfSample', 'Class':'ALL', 'Experiment':Experiment, 'model':model}
-                FileDF = pd.DataFrame(FileDict)
-                MasterDF = pd.concat([MasterDF, FileDF])
-            else:
-                WF1 = np.sum((F1values[:,0]*F1values[:,1]))/np.sum(F1values[:,1])
-                FileDict = {'F1':[WF1], 'Support':[np.sum(F1values[:,1])], 'RiverName':TestRiverTuple[f], 'Type':Phase2Type, 'Sample':'InSample', 'Class':'ALL', 'Experiment':Experiment, 'model':model}
-                FileDF = pd.DataFrame(FileDict)
-                MasterDF = pd.concat([MasterDF, FileDF])
- 
+    CNN_df = CNN_df[1:]   
+    CNN_df['f1_score'] = 100 * CNN_df['f1_score']
+    CNN_df['class'][CNN_df['class']==1] = 'Water'
+    CNN_df['class'][CNN_df['class']==2] = 'Sediment'
+    CNN_df['class'][CNN_df['class']==3] = 'Green Veg.'
+    CNN_df['class'][CNN_df['class']==4] = 'Senesc. Veg.'
+    CNN_df['class'][CNN_df['class']==5] = 'Paved Road'
+    CNN_df['type'] = 'CNN'
+    CNN_df['experiment'] = Experiment
+    CNN_df['model'] = model
+
+# Get the MLP (phase 2) classification reports compiled. 
+
+# establish Phase 2 DF  
+p2_df = pd.DataFrame(np.zeros([1,8]),columns = ['class','f1_score','support','RiverName','Image','type','experiment','model'])])
+                  
+# for each river, get all the csv files that match river name
+#   for each csv file, extract: class, f1 and support scores to new DF
+#       Clean and concat the CNN csv files as we go
+#   Renames classes and add type, exp, model column info
+for f,riv in enumerate(TestRiverTuple):
+    print('Compiling Phase 2 reports for ' + riv)
+    
+    if Phase2Type == 'MLP':
+        p2_csv = glob.glob(ScorePath+"MLP_" + riv + "*.csv")
+    elif Phase2Type == 'RF':
+        p2_csv = glob.glob(ScorePath+"RF_" + riv + "*.csv")
+
+    for i,csv in enumerate(p2_csv):
+
+        DF = pd.read_csv(csv)                       
+        FileDf = DF.filter(['class','f1_score','support'],axis=1)
+        FileDf = FileDf.drop(FileDf[(FileDf.f1_score == 0) & (FileDf.support == 0)].index)
+        FileDf = FileDf.append(pd.DataFrame([['ALL',np.sum((FileDf.f1_score*FileDf.support))/np.sum(FileDf.support),np.sum(FileDf.support)]],columns=['class','f1_score','support']))
+        FileDf['RiverName'] = riv
+        FileDf['Image'] = os.path.basename(csv).split('_')[1] + "_" + os.path.basename(csv).split('_')[2]
+        p2_df = pd.concat([p2_df, FileDf], sort = False)
+        
+    p2_df = p2_df[1:]
+    p2_df['f1_score'] = 100 * p2_df['f1_score']
+    p2_df['class'][p2_df['class']==1] = 'Water'
+    p2_df['class'][p2_df['class']==2] = 'Sediment'
+    p2_df['class'][p2_df['class']==3] = 'Green Veg.'
+    p2_df['class'][p2_df['class']==4] = 'Senesc. Veg.'
+    p2_df['class'][p2_df['class']==5] = 'Paved Road'
+    p2_df['experiment'] = Experiment
+    p2_df['model'] = model
+    
+    if Phase2Type == 'MLP':
+        p2_df['type'] = 'MLP' 
+    elif Phase2Type == 'RF':
+        p2_df['type'] = 'RF' 
+
 SaveName = ScorePath + 'Compiled_' + Experiment + '.csv'
-MasterDF.to_csv(SaveName)
+pd.concat([CNN_df,p2_df]).to_csv(SaveName,index=False)

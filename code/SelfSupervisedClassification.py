@@ -92,6 +92,8 @@ DisplayHoldout =  False #Display the results figure which is saved to disk.
 OutDPI = 150 #Recommended 150 for inspection 1200 for papers.  
 
 '''FILTERING OPTIONS'''
+#These parameters offer extra options to smooth the classification outputs.  By default they are set
+#to be inactive.  They are not used or discussed in the paper and poster associated to this code.
 MinTiles = 0 #The minimum number of contiguous tiles to consider as a significnat element in the image.  
 RecogThresh = 0 #minimum prob of the top-1 predictions to keep
 SmallestElement = 0 # Despeckle the classification to the smallest length in pixels of element remaining, just enter linear units (e.g. 3 for 3X3 pixels)

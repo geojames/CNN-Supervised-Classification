@@ -81,10 +81,10 @@ import fnmatch
 #------------------------------------------------------------
 #Watch the \\ and if there is a bug go to single quotes.  This folder shold have the training images, labels and the pre-trained NASNet model.
 #Trained model and class key will also be written out to the training folder
-TrainPath = 'Empty'  
+TrainPath = 'D:\\DeepRiverscapes\\TrainingFinal'  
 #Input and Output name for the model.  It wil be saved in the training folder
 ModelInputName = 'NASNetMobile_base_50px' #no extensions
-ModelOutputName = 'Empty'      
+ModelOutputName = 'CNNphase1_11rivers'      
          #where the model will be saved
 
 NClasses = 5 #The number of classes in the imagery. Adjust as needed
@@ -94,9 +94,9 @@ NClasses = 5 #The number of classes in the imagery. Adjust as needed
 #use this option to train the model with a validation subset. Accuracy and loss checks will be displayed.
 #When the tuning is satisfactory, set to False and train with the whole dataset. Model will only be saved if this is set to False
 #When true the sript will exit with a system error and display loss/acc vs epoch figures.  This is intentional.
-ModelTuning = False
-TuningEpochs = 50 
-TuningSubSamp = 0.15 # Subsample of data, 0-1, to be used in tuning.
+ModelTuning = True
+TuningEpochs = 15 
+TuningSubSamp = 0.25 # Subsample of data, 0-1, to be used in tuning.
 
 #If the model is tuned, enter the right number of epochs.
 #This is only used when ModelTuning is False.  

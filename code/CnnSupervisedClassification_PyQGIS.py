@@ -372,7 +372,7 @@ else:
     PredictedImage[ALPHA==0]=0
     del(ALPHA, EstimatorNN, PredictedPixels)
         #plt.imshow(PredictedImage)
-    '''Georeferenced Export'''
+    '''Georeferenced Export of the final CSC class'''
     ImageFile = gdal.Open(ImageName)
     driver = gdal.GetDriverByName("GTiff")
     outRaster = driver.Create(OutputName2, PredictedImage.shape[1], PredictedImage.shape[0], gdal.GDT_Byte)
@@ -387,7 +387,7 @@ else:
     outRaster = None        # close output file
     ImageFile = None        # close input file
     ##Open the new Class Raster data in QGIS
-    print('Displaying Classification')
+    print('Displaying CSC Classification')
     time.sleep(1)
     fileInfo = QFileInfo(OutputName2)
     baseName = fileInfo.baseName()

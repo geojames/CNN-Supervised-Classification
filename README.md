@@ -75,7 +75,7 @@ We recommend using the long term release of QGIS (currently 3.4).  Additionnal P
 5. In Environments, append the CUDA locations to the PATH variable.  These should replicate the paths set in windows during CUDA and cudnn installation.  NOTE: this can be a delicate process, any mistake may require a complete re-install of QGIS.
 
 ### GIS usage
-Add your orthoimage as a raster layer in QGIS.  Open the Python console and there open the CnnSupervisedClassification_PyQGIS script.  Fill the user parameters on lines 75 to 85 of the script and execute.  Geocoded class rasters for both the CNN and CNN+MLP stage of CSC will be displayed in QGIS and saved to disk.  If you have specified a validation dataset in the form of a raster (line 79).  Some classification metrics and a confusion matrix will be displayed in the Python console.. 
+Add your orthoimage as a raster layer in QGIS.  Open the Python console and there open the CnnSupervisedClassification_PyQGIS script.  Fill the user parameters on lines 75 to 85 of the script and execute.  Geocoded class rasters for both the CNN (prefixed with CLASS_CNN_) and CNN+MLP stage (prefixed with CLASS_CSC_) of CSC will be displayed in QGIS and saved to disk.  If you have specified a validation dataset in the form of a raster (line 79).  Some classification metrics and a confusion matrix will be displayed in the Python console.. 
 
 
 ## Authors:

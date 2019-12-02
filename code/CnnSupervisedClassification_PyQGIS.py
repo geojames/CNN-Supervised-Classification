@@ -76,7 +76,7 @@ ModelName = 'Empty'     #should be the model name from previous run of TrainCNN.
 ModelPath = 'Empty'  # path to the model
 ImageFolder = 'Empty'
 ImageFile = 'Empty'
-ClassFile = 'Empty'#leave empty if none
+ClassFile = 'Empty'#leave empty if none.  In that case no validation will be performed.
 NoData = 0 #no data values if mosaic has no alpha layer
 
 '''BASIC PARAMETER CHOICES'''
@@ -273,7 +273,7 @@ else:
     ClassKey = pd.read_csv(ClassKeyPath)
 
 
-    """Classify the holdout images with Self-Supervised Classification"""
+    """Classify the holdout images with CNN-Supervised Classification"""
     size = 50 #Do not edit. The base models supplied all assume a tile size of 50.
 
         # timer

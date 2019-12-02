@@ -80,7 +80,7 @@ ClassFile = 'Empty'#leave empty if none
 NoData = 0 #no data values if mosaic has no alpha layer
 
 '''BASIC PARAMETER CHOICES'''
-TrainingEpochs = 15 #Typically this can be reduced
+TrainingEpochs = 15 #This requires minimal experimentation to tune
 Ndims = 3 # Feature Dimensions. should be 3 for RGB
 NClasses = 5  #The number of classes in the data. This MUST be the same as the classes used to retrain the model
   

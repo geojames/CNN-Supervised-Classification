@@ -81,10 +81,10 @@ import fnmatch
 #------------------------------------------------------------
 #Watch the \\ and if there is a bug go to single quotes.  This folder shold have the training images, labels and the pre-trained NASNet model.
 #Trained model and class key will also be written out to the training folder
-TrainPath = 'Empty'  
+TrainPath = 'E:\\DeepRiverscapes\\MargSix'  
 #Input and Output name for the model.  It wil be saved in the training folder
-ModelInputName = 'NASNetMobile_base_50px' #no extensions
-ModelOutputName = 'Empty'      
+ModelInputName = 'NASNetLarge_base_50px' #no extensions
+ModelOutputName = 'Marg6'      
          #where the model will be saved
 
 NClasses = 5 #The number of classes in the imagery. Adjust as needed
@@ -95,12 +95,12 @@ NClasses = 5 #The number of classes in the imagery. Adjust as needed
 #When the tuning is satisfactory, set to False and train with the whole dataset. Model will only be saved if this is set to False
 #When true the sript will exit with a system error and display loss/acc vs epoch figures.  This is intentional.
 ModelTuning = False
-TuningEpochs = 50 
-TuningSubSamp = 0.15 # Subsample of data, 0-1, to be used in tuning.
+TuningEpochs = 20 
+TuningSubSamp = 0.55 # Subsample of data, 0-1, to be used in tuning.
 
 #If the model is tuned, enter the right number of epochs.
 #This is only used when ModelTuning is False.  
-TrainingEpochs = 10
+TrainingEpochs = 7
 BatchSize = 100 #will depend on your GPU
 
 # Path checks- checks for folder ending slash, adds if nessesary
@@ -285,7 +285,7 @@ for f,riv in enumerate(RiverTuple):
         if len(Im3D) == 2:
             Im3D = Im3D[0]
 
-        Class = io.imread(class_img[i], as_gray=True)
+        Class = io.imread(class_img[i])
         if Im3D.shape[0] != Class.shape[0]:
             sys.exit("Error, Image and class mask do not have the same dimensions")
             

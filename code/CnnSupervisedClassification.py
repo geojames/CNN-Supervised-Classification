@@ -12,7 +12,7 @@ __url__ = "https://github.com/geojames/Self-Supervised-Classification"
 
 
 """
-Name:           CNNSupervisedClassification.py
+Name:           SelfSupervisedClassification.py
 Compatibility:  Python 3.6
 Description:    Performs Self-Supervised Image CLassification with a 
                 pre-trained Convolutional Neural Network model.
@@ -45,6 +45,7 @@ SOFTWARE.
 
 ###############################################################################
 """ Libraries"""
+#import os; os.environ['KERAS_BACKEND'] = 'theano'
 from keras import regularizers
 from keras import optimizers
 from keras.models import load_model
@@ -55,6 +56,7 @@ import matplotlib.patches as mpatches
 from skimage import io
 import skimage.transform as T
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier as RFC
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, BatchNormalization
 from keras.wrappers.scikit_learn import KerasClassifier
@@ -63,7 +65,7 @@ from skimage.filters.rank import median, entropy, modal
 import os.path
 from sklearn import metrics
 from skimage.morphology import disk
-from imblearn.combine import SMOTEENN
+#from imblearn.combine import SMOTEENN
 import copy
 import sys
 from IPython import get_ipython #this can be removed if not using Spyder
@@ -75,20 +77,20 @@ import glob
 """User data input. Fill in the info below before running"""
 #############################################################
 
-ModelName = 'Empty'     #should be the model name from previous run of TrainCNN.py
-TrainPath = 'Empty'  
-PredictPath = 'Empty'    #Location of the images
-ScorePath = 'Empty'      #location of the output files and the model
-Experiment = 'Empty'    #ID to append to output performance files
+ModelName = 'NASNetMobile_50x_5riv_25ep'     #should be the model name from previous run of TrainCNN.py (NO FILE ENDING)
+TrainPath = 'E:/DeepRiverscapes/TrainingFinal/'  # path to the model
+PredictPath = 'E:/DeepRiverscapes/PredictFinal/'   #Location of the images to classify
+ScorePath = 'E:/DeepRiverscapes/TileTest/'      #location of the output files and the model
+Experiment = 'MLPbug'    #ID to append to output performance files
+
 
 '''BASIC PARAMETER CHOICES'''
 UseSmote = False #Turn SMOTE-ENN resampling on and off
 MLP = True #If false, the phase 2 class will be done with a random forest
 TrainingEpochs = 35 #Typically this can be reduced
-Ndims = 3 # Feature Dimensions. 3 if just RGB, 4 will add a co-occurence entropy on 11x11 pixels.  There is NO evidence showing that this actually improves the outcomes. RGB is recommended.
-SubSample = 1 #0-1 percentage of the CNN output to use in the MLP. 1 gives the published results.
+Ndims = 4 # Feature Dimensions. 4 if using entropy in phase 2, 3 if just RGB
+SubSample = 0.6 #0-1 percentage of the CNN output to use in the MLP.
 NClasses = 5  #The number of classes in the data. This MUST be the same as the classes used to retrain the model
-SaveClassRaster = False #If true this will save each class image to disk.  Outputs are not geocoded in this script. For GIS integration, see CnnSupervisedClassification_PyQGIS.py
 DisplayHoldout =  False #Display the results figure which is saved to disk.  
 OutDPI = 150 #Recommended 150 for inspection 1200 for papers.  
 
@@ -268,8 +270,13 @@ def GetF1(report):
     return dat[17]
 
 ##############################################################################
-"""Instantiate the MLP pixel-based classifier""" 
+"""Instantiate Random Forest and Dense Neural Network pixel-based classifiers""" 
    
+#Instantiate the Random Forest estimator
+EstimatorRF = RFC(n_estimators = 150, n_jobs = 8, verbose = Chatty) #adjust this to your processors
+
+
+
 
 # define deep the model with L2 regularization and dropout
 def deep_model_L2D():
@@ -347,7 +354,7 @@ ClassKeyPath = TrainPath + ModelName + '.csv'
 ClassKey = pd.read_csv(ClassKeyPath)
 
 ###############################################################################
-"""Classify the holdout images with CNN-Supervised Classification"""
+"""Classify the holdout images with Self-Supervised Classification"""
 size = 50 #Do not edit. The base models supplied all assume a tile size of 50.
 
 # Getting River Names from the files
@@ -364,7 +371,7 @@ class_img = glob.glob(PredictPath + "SCLS_*.tif*")
 
 for f,riv in enumerate(TestRiverTuple):
     for i,im in enumerate(img): 
-        print('CNN-supervised classification of ' + os.path.basename(im))
+        print('Self-supervised classification of ' + os.path.basename(im))
         Im3D = io.imread(im)
         #print(isinstance(Im3D,uint8))
         if len(Im3D) == 2:
@@ -379,7 +386,7 @@ for f,riv in enumerate(TestRiverTuple):
         I_tiles = split_image_to_tiles(ImCrop, size)
         I_tiles = np.int16(I_tiles) / 255
         #Apply the convnet
-        print('Detecting CNN-supervised training areas')
+        print('Detecting self-supervised training areas')
         PredictedTiles = ConvNetmodel.predict(I_tiles, batch_size = 32, verbose = Chatty)
         #Convert the convnet one-hot predictions to a new class label image
         PredictedTiles[PredictedTiles < RecogThresh] = 0
@@ -396,28 +403,23 @@ for f,riv in enumerate(TestRiverTuple):
             #PredictedClass = modal(np.uint8(PredictedClass), disk(2*(MinTiles*size*size)+1))
 								
         #Prep the pixel data from the cropped image and new class label image
+        print('Processing Entropy and Median filter')
+        Entropy = entropy(Im3D[:,:,0], selem = np.ones([11,11]), shift_x = 3,  shift_y = 0)
+        MedImage = ColourFilter(Im3D) #Median filter on all 3 bands
+        rv = MedImage[:,:,0].reshape(-1,1)#Split and vectorise the bands
+        gv = MedImage[:,:,1].reshape(-1,1)
+        bv = MedImage[:,:,2].reshape(-1,1)
+        #Vectorise the bands, use the classification prdicted by the CNN
+        #m = np.ndarray.flatten(PredictedClass).reshape(-1,1) 
+        #rv = np.ndarray.flatten(r).reshape(-1,1)
+        #gv = np.ndarray.flatten(g).reshape(-1,1)
+        #bv = np.ndarray.flatten(b).reshape(-1,1)
+        #Entropyv = np.ndarray.flatten(Entropy).reshape(-1,1)
+        m = PredictedClass.reshape(-1,1) 
+        Entropyv = Entropy.reshape(-1,1)
         
-            if Ndims == 4:
-                print('Processing Entropy and Median filter')
-                Entropy = entropy(Im3D[:,:,0], selem = np.ones([11,11]), shift_x = 3,  shift_y = 0)
-            else:
-                print('Processing Median filter')
-            MedImage = ColourFilter(Im3D) #Median filter on all 3 bands
-            r = MedImage[:,:,0]#Split the bands
-            g = MedImage[:,:,1]
-            b = MedImage[:,:,2]
-            #Vectorise the bands, use the classification prdicted by the AI
-            m = np.ndarray.flatten(PredictedClass).reshape(-1,1) 
-            rv = np.ndarray.flatten(r).reshape(-1,1)
-            gv = np.ndarray.flatten(g).reshape(-1,1)
-            bv = np.ndarray.flatten(b).reshape(-1,1)
-            if Ndims == 4:
-                Entropyv = np.ndarray.flatten(Entropy).reshape(-1,1) 
-                ColumnDat = np.concatenate((rv,gv,bv,Entropyv,m), axis = 1)
-            else:
-                ColumnDat = np.concatenate((rv,gv,bv,m), axis = 1)
-                
-            del(r,g,b,m)
+
+        ColumnDat = np.concatenate((rv,gv,bv,Entropyv,m), axis = 1)
         #Rescale the data for the fitting work
         SCAL = StandardScaler()
         ScaledValues = SCAL.fit_transform(ColumnDat[:,0:-1])
@@ -448,24 +450,25 @@ for f,riv in enumerate(TestRiverTuple):
             Y = Y_presmote     
 
         
-
-        print('Fitting MLP Classifier on ' + str(len(X)) + ' pixels')
-        EstimatorNN.fit(X, Y)
-
+        if MLP:
+            print('Fitting MLP Classifier on ' + str(len(X)) + ' pixels')
+            EstimatorNN.fit(X, Y)
+        else:
+            print('Fitting Random Forest Classifier on ' + str(len(X)) + ' pixels')
+            EstimatorRF.fit(X, Y)
             
         #Fit the predictor to all pixels
-        if Ndims == 4:
-            FullDat = np.concatenate((rv,gv,bv,Entropyv), axis = 1)
-            del(rv,gv,bv,Entropyv, MedImage)
+        FullDat = np.concatenate((rv,gv,bv,Entropyv), axis = 1)
+        del(rv,gv,bv,Entropyv, MedImage)
+        SCAL = StandardScaler()
+        ScaledValues = SCAL.fit_transform(FullDat)
+        if MLP:
+            PredictedPixels = EstimatorNN.predict(ScaledValues)
         else:
-            FullDat = np.concatenate((rv,gv,bv), axis = 1)
-            del(rv,gv,bv, MedImage)
-
-        PredictedPixels = EstimatorNN.predict(ScaledValues)
-
+            PredictedPixels = EstimatorRF.predict(ScaledValues)
         
         #Reshape the predictions to image format and display
-        PredictedImage = PredictedPixels.reshape(Im3D.shape[0], Im3D.shape[1])
+        PredictedImage = PredictedPixels.reshape(Entropy.shape[0], Entropy.shape[1])
         if SmallestElement > 0:
             PredictedImage = modal(np.uint8(PredictedImage), disk(2*SmallestElement+1)) #clean up the class with a mode filter
 
@@ -484,15 +487,17 @@ for f,riv in enumerate(TestRiverTuple):
         print('CNN tiled classification results for ' + os.path.basename(im))
         print(reportCNN)
         print('\n')
-        print('CNN-Supervised classification results for ' + os.path.basename(im))
+        print('Self-Supervised classification results for ' + os.path.basename(im))
         print(reportSSC)
         #print('Confusion Matrix:')
         #print(metrics.confusion_matrix(Class, PredictedImageVECT))
         print('\n')
-        
-        CSCname = ScorePath + 'CSC_' + os.path.basename(im)[:-4] + '_' + Experiment + '.csv'    
-        classification_report_csv(reportSSC, CSCname)
-
+        if MLP:
+            SSCname = ScorePath + 'MLP_' + os.path.basename(im)[:-4] + '_' + Experiment + '.csv'    
+            classification_report_csv(reportSSC, SSCname)
+        else:
+            SSCname = ScorePath + 'RF_' + os.path.basename(im)[:-4] +  '_' + Experiment + '.csv'    
+            classification_report_csv(reportSSC, SSCname)
         CNNname = ScorePath + 'CNN_' + os.path.basename(im)[:-4] + '_' + Experiment + '.csv'    
         classification_report_csv(reportCNN, CNNname)            
         
@@ -526,21 +531,14 @@ for f,riv in enumerate(TestRiverTuple):
         plt.subplot(2,2,4)
         cmapCHM = colors.ListedColormap(['black', 'lightblue','orange','green','yellow','red'])
         plt.imshow(PredictedImage, cmap=cmapCHM)
-        
-        plt.xlabel('CNN-Supervised Classification. F1: ' + GetF1(reportSSC), fontweight='bold' )
-        
-        FigName = ScorePath + 'CSC_'+  Experiment + '_'+ os.path.basename(im)[:-4] +'.png'
+        if MLP:
+            plt.xlabel('Self-Supervised Classification (MLP). F1: ' + GetF1(reportSSC), fontweight='bold' )
+        else:
+            plt.xlabel('Self-Supervised Classification (RF). F1: ' + GetF1(reportSSC), fontweight='bold' )
+        FigName = ScorePath + 'SSC_'+  Experiment + '_'+ os.path.basename(im)[:-4] +'.png'
         plt.savefig(FigName, dpi=OutDPI)
         if not DisplayHoldout:
             plt.close()
-        # Figure output below is NOT geocoded.
-        if SaveClassRaster:
-            ClassRasterName = ScorePath + 'CSC_'+ os.path.basename(im)[:-4] +'.tif'
-            PredictedImage = PredictedPixels.reshape(Im3D.shape[0], Im3D.shape[1]) #This removes the pixels from line 500 that are used to control coolur scheme
-            io.imsave(ClassRasterName, PredictedImage)
             
 
-            
-
-
-
+ 

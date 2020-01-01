@@ -44,6 +44,7 @@ SOFTWARE.
 
 ###############################################################################
 """ Libraries"""
+#import os; os.environ['KERAS_BACKEND'] = 'theano'
 from keras import regularizers
 from keras import optimizers
 from keras.models import load_model
@@ -63,7 +64,7 @@ from skimage.filters.rank import median, entropy, modal
 import os.path
 from sklearn import metrics
 from skimage.morphology import disk
-from imblearn.combine import SMOTEENN
+#from imblearn.combine import SMOTEENN
 import copy
 import sys
 from IPython import get_ipython #this can be removed if not using Spyder
@@ -75,11 +76,12 @@ import glob
 """User data input. Fill in the info below before running"""
 #############################################################
 
-ModelName = 'Empty'     #should be the model name from previous run of TrainCNN.py
-TrainPath = 'Empty'  
-PredictPath = 'Empty'    #Location of the images
-ScorePath = 'Empty'      #location of the output files and the model
-Experiment = 'Empty'    #ID to append to output performance files
+ModelName = 'NASNetMobile_50x_5riv_25ep'     #should be the model name from previous run of TrainCNN.py (NO FILE ENDING)
+TrainPath = 'E:/DeepRiverscapes/TrainingFinal/'  # path to the model
+PredictPath = 'E:/DeepRiverscapes/PredictFinal/'   #Location of the images to classify
+ScorePath = 'E:/DeepRiverscapes/TileTest/'      #location of the output files and the model
+Experiment = 'MLPbug'    #ID to append to output performance files
+
 
 '''BASIC PARAMETER CHOICES'''
 UseSmote = False #Turn SMOTE-ENN resampling on and off

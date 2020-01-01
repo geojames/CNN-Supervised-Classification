@@ -9,6 +9,7 @@ __version__ = '1.2'
 __status__ = "stable release"
 __url__ = "https://github.com/geojames/Self-Supervised-Classification"
 
+
 """
 Name:           CnnSupervisedClassification_PyQGIS.py
 

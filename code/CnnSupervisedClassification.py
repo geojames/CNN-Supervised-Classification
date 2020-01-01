@@ -10,6 +10,7 @@ __version__ = '1.1'
 __status__ = "initial release"
 __url__ = "https://github.com/geojames/Self-Supervised-Classification"
 
+
 """
 Name:           CNNSupervisedClassification.py
 Compatibility:  Python 3.6
